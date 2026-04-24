@@ -6,7 +6,8 @@ import '../../core/services/firestore_service.dart';
 import '../../core/services/firebase_auth_service.dart';
 import '../../core/services/biometric_service.dart';
 import '../../core/services/audio_player_service.dart';
-import '../../core/models/track_model.dart';
+import '../../core/models/track.dart';
+
 class FavoritesScreen extends StatefulWidget {
   const FavoritesScreen({super.key});
 

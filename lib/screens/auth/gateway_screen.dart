@@ -4,6 +4,8 @@ import '../../theme/app_theme.dart';
 import '../../widgets/ambient_background.dart';
 import '../../widgets/glass_card.dart';
 import '../../core/services/biometric_service.dart';
+import 'package:app_settings/app_settings.dart';
+import 'package:flutter/services.dart';
 import 'dart:math' as math;
 
 class GatewayScreen extends StatefulWidget {
@@ -63,16 +65,18 @@ class _GatewayScreenState extends State<GatewayScreen>
       if (mounted) {
         setState(() {
           _statusMessage = 'No Fingerprint Found';
-          _statusSub = 'PLEASE SET UP BIOMETRICS IN SETTINGS';
+          _statusSub = 'OPENING SYSTEM SETTINGS';
           _ringColor = AppColors.error;
           _isAuthenticating = false;
         });
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
-                'No biometrics enrolled. Set up fingerprint in device settings.'),
+                'No biometrics enrolled. Redirecting to device settings...'),
           ),
         );
+        // Requirement: Redirect user to system settings to register fingerprint
+        AppSettings.openAppSettings(type: AppSettingsType.security);
       }
       return;
     }
@@ -84,6 +88,7 @@ class _GatewayScreenState extends State<GatewayScreen>
     if (!mounted) return;
 
     if (success) {
+      SystemSound.play(SystemSoundType.click); // Requirement: Play a success sound
       setState(() {
         _statusMessage = 'Authenticated ✓';
         _statusSub = 'WELCOME BACK';

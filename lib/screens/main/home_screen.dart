@@ -7,6 +7,8 @@ import 'package:provider/provider.dart';
 import '../../core/providers/music_provider.dart';
 import '../../core/models/track.dart';
 import '../../core/services/audio_player_service.dart';
+import '../../core/services/firestore_service.dart';
+import '../../core/services/firebase_auth_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -465,8 +467,29 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             Row(
               children: [
-                Icon(Icons.favorite, color: isFavorite ? AppColors.primary : AppColors.outline),
-                const SizedBox(width: 24),
+                StreamBuilder<List<Track>>(
+                  stream: FirebaseAuthService.instance.currentUser != null
+                      ? FirestoreService.instance.favoritesStream(FirebaseAuthService.instance.currentUser!.uid)
+                      : const Stream.empty(),
+                  builder: (context, snapshot) {
+                    final isFav = snapshot.data?.any((t) => t.id == track.id) ?? false;
+                    return IconButton(
+                      icon: Icon(Icons.favorite, color: isFav ? AppColors.primary : AppColors.outline),
+                      onPressed: () {
+                        final uid = FirebaseAuthService.instance.currentUser?.uid;
+                        if (uid != null) {
+                          if (isFav) {
+                            // Removing favorite from home also removes it
+                            FirestoreService.instance.removeFavorite(uid, track.id);
+                          } else {
+                            FirestoreService.instance.addFavorite(uid, track);
+                          }
+                        }
+                      },
+                    );
+                  },
+                ),
+                const SizedBox(width: 8),
                 const Text('--:--', style: TextStyle(color: AppColors.outline, fontSize: 12)),
                 const SizedBox(width: 24),
                 const Icon(Icons.more_vert, color: AppColors.outline),

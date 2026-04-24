@@ -4,6 +4,8 @@ import '../../widgets/ambient_background.dart';
 import '../../widgets/glass_card.dart';
 import '../../core/services/stats_service.dart';
 import '../../core/services/firebase_auth_service.dart';
+import 'package:provider/provider.dart';
+import '../../core/providers/music_provider.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -100,19 +102,34 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                   const SizedBox(height: 24),
                   
-                  GridView.count(
-                    crossAxisCount: MediaQuery.of(context).size.width > 800 ? 4 : 2,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    crossAxisSpacing: 24,
-                    mainAxisSpacing: 24,
-                    childAspectRatio: 0.8,
-                    children: [
-                      _buildTrackCard(context, 'Neon Horizons', 'Synthetic Dreams', 'https://lh3.googleusercontent.com/aida-public/AB6AXuDaNXaYwehMaRH37dG9A05zZXLOgbYIZZzndIqiEHBsv3ojVtgT75ajEbJ6CZf-Z92aC4FUEZYCRJ5gNm4GEkQpQYYp-ZZRppRZ7Kplrbj-O-zOXghLHcUau75Zfs61-NC0vVc95_MMGH4G5I6R5r9sCfsEBKsbN7pgTBOqDKQvfVLIbWUePWcM2OOQGtognm0UQf9_A4lOt-_xZ09552Hj7nAWgk0z8HH_6sYof5Y3NvZFAbIsj2VzzRz59VWiVSOIh43GU_wH1Bk'),
-                      _buildTrackCard(context, 'After Hours', 'Midnight Pulse', 'https://lh3.googleusercontent.com/aida-public/AB6AXuAcS1moSND8JNo1FtLo8MS54XtKKvc9o44UXSsioWBJaiIO7qAWZW5zbT-V4WQbiYViuMUwegJ1IPNguH6e097hUQQwWGJJoGOJH3sKk1EaFi5iXbRwjkhswX5zgxeoCQ0g1LBHIU5boHrvellvxgHP2BlHEgA9LISfOD3gXOgiX_Tq1ASomrythgyZzRzmzhUIlqcgweySeUH3R2PAvM_OteDhBi577xA6Ctvo4EUsBEDGhSs5Jo6sEVw_6mRP1kqjpcc33Pwswp8'),
-                      _buildTrackCard(context, 'Electric Sky', 'Velocity X', 'https://lh3.googleusercontent.com/aida-public/AB6AXuDu0iXD-IYIwGpQN2lSawaLSyI-DlXhR7f1tolR8brQ_99iDVCv069bVi5v4Ih2r7hVlWGoUqc32ZgBcLtYZOtMWlCi_GFr4k7y9noRVddq9rFKLkS9KFPG5BdR9SBWXlXj0R4i8brbBg1G6uzQgAx-uB4k9XuP2wb0bNns0jNsW6e_wdXSuFmhG3MOkyf5Hb7P-hmdk6Fs9CFjIr_v3SZvEiELea6gLWRy00BR5oBDNyQl8EQ01yLlB47jEGsDWa7bxhrzYcB9I04'),
-                      _buildTrackCard(context, 'Subliminal', 'The Low-Fi Project', 'https://lh3.googleusercontent.com/aida-public/AB6AXuAu8DW19cA_IO2b7A38wIqOPEiJqAKhZ9kAjReTWT7jk3gOrfbsHHN3jLZZYA0T1V2SKr4Gj_9YxXtbZFuLxQ4j3mSqBF9Bg2sJhRzZkg4tO1CbX7X2utxBUZA-6DXxg21xov1bCXKvk5qfP_w97hA4Dv6PbWqxxFv5KeSfV2WEPNmeRFZ9SihqX0xk2Qfrt0onehE3wsljx8_Tw1bQHQYxlP5AJp_WtWcB69pfm2wXkMPOglHOT1MsgkntO_f49fvDfsXasGtsthw'),
-                    ],
+                  Consumer<MusicProvider>(
+                    builder: (context, provider, child) {
+                      if (provider.isLoading) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                      
+                      final tracks = provider.currentTracks.take(4).toList();
+                      if (tracks.isEmpty) {
+                        return const Text('No tracks available yet.', style: TextStyle(color: AppColors.outlineVariant));
+                      }
+                      
+                      return GridView.count(
+                        crossAxisCount: MediaQuery.of(context).size.width > 800 ? 4 : 2,
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        crossAxisSpacing: 24,
+                        mainAxisSpacing: 24,
+                        childAspectRatio: 0.8,
+                        children: tracks.map((track) {
+                          return _buildTrackCard(
+                            context,
+                            track.name,
+                            track.artistName,
+                            track.image.isNotEmpty ? track.image : 'https://fakeimg.pl/400x400/282828/eae0d0/'
+                          );
+                        }).toList(),
+                      );
+                    },
                   ),
                   
                   const SizedBox(height: 120), // Bottom padding for nav bar
@@ -215,7 +232,31 @@ class _DashboardScreenState extends State<DashboardScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Monthly Goal (${_goalHours}h)', style: Theme.of(context).textTheme.headlineSmall),
+                Row(
+                  children: [
+                    Text('Monthly Goal ', style: Theme.of(context).textTheme.headlineSmall),
+                    DropdownButton<int>(
+                      value: _goalHours,
+                      dropdownColor: AppColors.surfaceContainerHigh,
+                      underline: const SizedBox(),
+                      icon: const Icon(Icons.arrow_drop_down, color: AppColors.primary),
+                      items: [10, 20, 30, 50].map((int value) {
+                        return DropdownMenuItem<int>(
+                          value: value,
+                          child: Text('${value}h', style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: AppColors.primary)),
+                        );
+                      }).toList(),
+                      onChanged: (int? newValue) {
+                        if (newValue != null) {
+                          setState(() {
+                            _goalHours = newValue;
+                          });
+                          StatsService.instance.setMonthlyGoalHours(newValue);
+                        }
+                      },
+                    ),
+                  ],
+                ),
                 const SizedBox(height: 4),
                 Text(percentage >= 100 ? "Goal Met!" : "Keep listening!", style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.onSurfaceVariant)),
               ],
