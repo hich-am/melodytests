@@ -180,7 +180,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                     decoration: BoxDecoration(
                       color: AppColors.surfaceContainerHigh,
                       borderRadius: BorderRadius.circular(4),
-                      image: track.coverUrl.isNotEmpty ? DecorationImage(image: NetworkImage(track.coverUrl), fit: BoxFit.cover) : null,
+                      image: track.image.isNotEmpty ? DecorationImage(image: NetworkImage(track.image), fit: BoxFit.cover) : null,
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -188,8 +188,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(track.title, style: Theme.of(context).textTheme.titleMedium, overflow: TextOverflow.ellipsis),
-                        Text(track.artist, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.onSurfaceVariant), overflow: TextOverflow.ellipsis),
+                        Text(track.name, style: Theme.of(context).textTheme.titleMedium, overflow: TextOverflow.ellipsis),
+                        Text(track.artistName, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.onSurfaceVariant), overflow: TextOverflow.ellipsis),
                       ],
                     ),
                   ),
@@ -199,7 +199,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
             if (MediaQuery.of(context).size.width > 600)
               Expanded(
                 flex: 1,
-                child: Text(track.genre, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.onSurfaceVariant, fontStyle: FontStyle.italic)),
+                child: Text('Unknown Genre', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.onSurfaceVariant, fontStyle: FontStyle.italic)),
               ),
             Row(
               mainAxisSize: MainAxisSize.min,

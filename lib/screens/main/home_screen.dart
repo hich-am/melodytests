@@ -219,7 +219,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         decoration: BoxDecoration(
                                           borderRadius: BorderRadius.circular(4),
                                           image: DecorationImage(
-                                            image: NetworkImage(track.coverUrl.isNotEmpty ? track.coverUrl : 'https://fakeimg.pl/400x400/282828/eae0d0/?retina=1'),
+                                            image: NetworkImage(track.image.isNotEmpty ? track.image : 'https://fakeimg.pl/400x400/282828/eae0d0/?retina=1'),
                                             fit: BoxFit.cover,
                                           ),
                                         ),
@@ -229,9 +229,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                         child: Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
-                                            Text(track.title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14), overflow: TextOverflow.ellipsis),
+                                            Text(track.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14), overflow: TextOverflow.ellipsis),
                                             const SizedBox(height: 4),
-                                            Text(track.artist, style: TextStyle(color: Colors.grey[400], fontSize: 12), overflow: TextOverflow.ellipsis),
+                                            Text(track.artistName, style: TextStyle(color: Colors.grey[400], fontSize: 12), overflow: TextOverflow.ellipsis),
                                           ],
                                         ),
                                       ),
