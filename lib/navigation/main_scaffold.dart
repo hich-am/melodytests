@@ -7,7 +7,7 @@ import '../screens/main/favorites_screen.dart';
 // Note: Placeholder for ProfileScreen if exists, currently we can map to Dashboard.
 
 class MainScaffold extends StatefulWidget {
-  const MainScaffold({Key? key}) : super(key: key);
+  const MainScaffold({super.key});
 
   @override
   State<MainScaffold> createState() => _MainScaffoldState();
@@ -46,9 +46,9 @@ class _MainScaffoldState extends State<MainScaffold> {
                 child: Container(
                   padding: const EdgeInsets.only(top: 16, bottom: 32, left: 24, right: 24),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF131315).withOpacity(0.6),
+                    color: const Color(0xFF131315).withValues(alpha: 0.6),
                     border: Border(
-                      top: BorderSide(color: Colors.white.withOpacity(0.1), width: 1),
+                      top: BorderSide(color: Colors.white.withValues(alpha: 0.1), width: 1),
                     ),
                   ),
                   child: Row(
@@ -91,7 +91,7 @@ class _MainScaffoldState extends State<MainScaffold> {
                 ),
                 borderRadius: BorderRadius.circular(30),
                 boxShadow: [
-                  BoxShadow(color: AppColors.primaryContainer.withOpacity(0.5), blurRadius: 10),
+                  BoxShadow(color: AppColors.primaryContainer.withValues(alpha: 0.5), blurRadius: 10),
                 ],
               )
             : const BoxDecoration(

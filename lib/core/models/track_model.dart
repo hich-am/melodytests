@@ -15,16 +15,14 @@ class Track {
     required this.genre,
   });
 
-  factory Track.fromJamendoJson(Map<String, dynamic> json) {
+  factory Track.fromFmaJson(Map<String, dynamic> json) {
     return Track(
-      id: json['id']?.toString() ?? '',
-      title: json['name'] ?? 'Unknown Title',
-      artist: json['artist_name'] ?? 'Unknown Artist',
-      audioUrl: json['audio'] ?? '',
-      coverUrl: json['album_image'] ?? json['image'] ?? '',
-      genre: json['musicinfo']?['tags']?['genres']?.isNotEmpty == true
-          ? json['musicinfo']['tags']['genres'][0]
-          : 'Various',
+      id: json['track_id']?.toString() ?? '',
+      title: json['track_title']?.toString() ?? 'Unknown Title',
+      artist: json['artist_name']?.toString() ?? 'Unknown Artist',
+      audioUrl: json['track_file']?.toString() ?? '',
+      coverUrl: json['album_image']?.toString() ?? '',
+      genre: 'Various',
     );
   }
 

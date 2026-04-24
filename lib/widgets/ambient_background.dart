@@ -5,7 +5,7 @@ import '../theme/app_theme.dart';
 class AmbientBackground extends StatelessWidget {
   final Widget child;
 
-  const AmbientBackground({Key? key, required this.child}) : super(key: key);
+  const AmbientBackground({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +22,7 @@ class AmbientBackground extends StatelessWidget {
             height: 400,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: AppColors.primary.withOpacity(0.10),
+              color: AppColors.primary.withValues(alpha: 0.10),
             ),
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 120, sigmaY: 120),
@@ -38,7 +38,7 @@ class AmbientBackground extends StatelessWidget {
             height: 350,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: AppColors.secondary.withOpacity(0.10),
+              color: AppColors.secondary.withValues(alpha: 0.10),
             ),
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 120, sigmaY: 120),

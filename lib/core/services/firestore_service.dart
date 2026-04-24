@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../models/track_model.dart';
+import '../models/track.dart';
 
 class FirestoreService {
   FirestoreService._();

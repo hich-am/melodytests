@@ -2,9 +2,39 @@ import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/ambient_background.dart';
 import '../../widgets/glass_card.dart';
+import '../../core/services/stats_service.dart';
+import '../../core/services/firebase_auth_service.dart';
 
-class DashboardScreen extends StatelessWidget {
-  const DashboardScreen({Key? key}) : super(key: key);
+class DashboardScreen extends StatefulWidget {
+  const DashboardScreen({super.key});
+
+  @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
+  int _totalSeconds = 0;
+  int _goalHours = 20;
+  Map<int, double> _dailyMinutes = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _loadStats();
+  }
+
+  Future<void> _loadStats() async {
+    final total = await StatsService.instance.getTotalListeningSeconds();
+    final goal = await StatsService.instance.getMonthlyGoalHours();
+    final daily = await StatsService.instance.getDailyMinutesThisMonth();
+    if (mounted) {
+      setState(() {
+        _totalSeconds = total;
+        _goalHours = goal;
+        _dailyMinutes = daily;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +61,7 @@ class DashboardScreen extends StatelessWidget {
               sliver: SliverList(
                 delegate: SliverChildListDelegate([
                   const SizedBox(height: 16),
-                  Text('Hello, User', style: Theme.of(context).textTheme.displayMedium),
+                  Text('Hello, ${FirebaseAuthService.instance.currentUser?.displayName ?? 'User'}', style: Theme.of(context).textTheme.displayMedium),
                   const SizedBox(height: 8),
                   Text('Ready for your daily soundscape?', style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: AppColors.onSurfaceVariant)),
                   const SizedBox(height: 48),
@@ -109,14 +139,13 @@ class DashboardScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          Text('42h', style: Theme.of(context).textTheme.displayMedium),
-          const Spacer(),
-          const SizedBox(height: 24),
+          Text(StatsService.formatSeconds(_totalSeconds), style: Theme.of(context).textTheme.displayMedium),
+          const SizedBox(height: 16),
           Row(
             children: [
               const Icon(Icons.trending_up, color: AppColors.secondary, size: 16),
               const SizedBox(width: 8),
-              Text('+12% from last week', style: Theme.of(context).textTheme.labelSmall?.copyWith(color: AppColors.secondary)),
+              Text('Keep it up!', style: Theme.of(context).textTheme.labelSmall?.copyWith(color: AppColors.secondary)),
             ],
           ),
         ],
@@ -125,8 +154,15 @@ class DashboardScreen extends StatelessWidget {
   }
 
   Widget _buildActivityChartCard(BuildContext context) {
-    // Dummy heights for histogram
-    final heights = [0.4, 0.6, 0.45, 0.8, 0.95, 0.7, 0.55, 0.4, 0.65, 0.85, 1.0, 0.6];
+    // Convert daily stats to normalized heights for the histogram (max 60 mins)
+    final last30Days = List.generate(30, (index) {
+      final day = DateTime.now().subtract(Duration(days: 29 - index));
+      return _dailyMinutes[day.day] ?? 0.0;
+    });
+    
+    final maxMins = last30Days.reduce((a, b) => a > b ? a : b);
+    final normalizationFactor = maxMins > 0 ? maxMins : 60.0;
+    final heights = last30Days.map((m) => (m / normalizationFactor).clamp(0.0, 1.0)).toList();
     
     return GlassCard(
       padding: const EdgeInsets.all(32),
@@ -149,8 +185,8 @@ class DashboardScreen extends StatelessWidget {
               children: List.generate(heights.length, (index) {
                 final isPeak = heights[index] > 0.9;
                 return Container(
-                  width: 12, // simple fixed width for dummy chart
-                  height: 120 * heights[index],
+                  width: 4, // thin bars for 30 items
+                  height: 120 * heights[index].toDouble(),
                   decoration: BoxDecoration(
                     color: isPeak ? AppColors.primary : AppColors.surfaceContainerHighest,
                     borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
@@ -165,25 +201,30 @@ class DashboardScreen extends StatelessWidget {
   }
 
   Widget _buildGoalCard(BuildContext context) {
+    final progress = _totalSeconds / (_goalHours * 3600);
+    final percentage = (progress * 100).clamp(0, 100).toInt();
+
     return GlassCard(
       padding: const EdgeInsets.all(32),
       child: Flex(
         direction: MediaQuery.of(context).size.width > 600 ? Axis.horizontal : Axis.vertical,
         children: [
-          Expanded(
+          Flexible(
             flex: MediaQuery.of(context).size.width > 600 ? 1 : 0,
+            fit: MediaQuery.of(context).size.width > 600 ? FlexFit.tight : FlexFit.loose,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Monthly Listening Goal', style: Theme.of(context).textTheme.headlineSmall),
+                Text('Monthly Goal (${_goalHours}h)', style: Theme.of(context).textTheme.headlineSmall),
                 const SizedBox(height: 4),
-                Text("You're crushing your 60h target!", style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.onSurfaceVariant)),
+                Text(percentage >= 100 ? "Goal Met!" : "Keep listening!", style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.onSurfaceVariant)),
               ],
             ),
           ),
           SizedBox(height: MediaQuery.of(context).size.width > 600 ? 0 : 24, width: 24),
-          Expanded(
+          Flexible(
             flex: MediaQuery.of(context).size.width > 600 ? 2 : 0,
+            fit: MediaQuery.of(context).size.width > 600 ? FlexFit.tight : FlexFit.loose,
             child: Container(
               height: 16,
               decoration: BoxDecoration(
@@ -191,17 +232,20 @@ class DashboardScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
               alignment: Alignment.centerLeft,
-              child: Container(
-                width: 250, // Static width since it's a dummy
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(colors: [AppColors.primary, AppColors.secondary]),
-                  borderRadius: BorderRadius.circular(8),
+              child: FractionallySizedBox(
+                widthFactor: progress.clamp(0.0, 1.0),
+                alignment: Alignment.centerLeft,
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(colors: [AppColors.primary, AppColors.secondary]),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
               ),
             ),
           ),
           SizedBox(height: MediaQuery.of(context).size.width > 600 ? 0 : 24, width: 24),
-          Text('70%', style: Theme.of(context).textTheme.headlineMedium),
+          Text('$percentage%', style: Theme.of(context).textTheme.headlineMedium),
         ],
       ),
     );

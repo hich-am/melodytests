@@ -42,14 +42,14 @@ class AppTheme {
         primaryContainer: AppColors.primaryContainer,
         secondary: AppColors.secondary,
         tertiary: AppColors.tertiary,
-        background: AppColors.background,
+        // background is deprecated, using surface instead
         surface: AppColors.surface,
         onPrimary: const Color(0xFF430089),
         onSecondary: const Color(0xFF003545),
-        onBackground: AppColors.onBackground,
+        // onBackground is deprecated, using onSurface instead
         onSurface: AppColors.onSurface,
         onSurfaceVariant: AppColors.onSurfaceVariant,
-        surfaceVariant: AppColors.surfaceVariant,
+        surfaceContainerHighest: AppColors.surfaceVariant,
         error: AppColors.error,
         outline: AppColors.outline,
         outlineVariant: AppColors.outlineVariant,

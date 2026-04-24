@@ -1,7 +1,7 @@
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:audio_service/audio_service.dart';
-import '../models/track_model.dart';
+import '../models/track.dart';
 import 'stats_service.dart';
 
 class AudioPlayerService {
@@ -59,10 +59,10 @@ class AudioPlayerService {
       Uri.parse(track.audioUrl),
       tag: MediaItem(
         id: track.id,
-        album: track.genre,
-        title: track.title,
-        artist: track.artist,
-        artUri: track.coverUrl.isNotEmpty ? Uri.parse(track.coverUrl) : null,
+        album: track.albumName,
+        title: track.name,
+        artist: track.artistName,
+        artUri: track.image.isNotEmpty ? Uri.parse(track.image) : null,
       ),
     );
 

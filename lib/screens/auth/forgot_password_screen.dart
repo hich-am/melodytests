@@ -4,7 +4,7 @@ import '../../widgets/ambient_background.dart';
 import '../../widgets/glass_card.dart';
 
 class ForgotPasswordScreen extends StatelessWidget {
-  const ForgotPasswordScreen({Key? key}) : super(key: key);
+  const ForgotPasswordScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +53,7 @@ class ForgotPasswordScreen extends StatelessWidget {
                                   shape: BoxShape.circle,
                                   boxShadow: [
                                     BoxShadow(
-                                      color: AppColors.primary.withOpacity(0.2),
+                                      color: AppColors.primary.withValues(alpha: 0.2),
                                       blurRadius: 20,
                                     ),
                                   ],
@@ -74,13 +74,13 @@ class ForgotPasswordScreen extends StatelessWidget {
                                 style: const TextStyle(color: AppColors.onSurface),
                                 decoration: InputDecoration(
                                   hintText: 'Email address',
-                                  hintStyle: TextStyle(color: AppColors.outline.withOpacity(0.5)),
+                                  hintStyle: TextStyle(color: AppColors.outline.withValues(alpha: 0.5)),
                                   prefixIcon: const Icon(Icons.mail_outline, color: AppColors.outline),
                                   filled: true,
                                   fillColor: AppColors.surfaceContainerHigh,
                                   contentPadding: const EdgeInsets.symmetric(vertical: 20),
                                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
-                                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide(color: AppColors.secondary.withOpacity(0.3))),
+                                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide(color: AppColors.secondary.withValues(alpha: 0.3))),
                                 ),
                               ),
                               const SizedBox(height: 24),

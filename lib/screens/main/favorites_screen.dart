@@ -2,9 +2,33 @@ import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/ambient_background.dart';
 import '../../widgets/glass_card.dart';
+import '../../core/services/firestore_service.dart';
+import '../../core/services/firebase_auth_service.dart';
+import '../../core/services/biometric_service.dart';
+import '../../core/services/audio_player_service.dart';
+import '../../core/models/track_model.dart';
+class FavoritesScreen extends StatefulWidget {
+  const FavoritesScreen({super.key});
 
-class FavoritesScreen extends StatelessWidget {
-  const FavoritesScreen({Key? key}) : super(key: key);
+  @override
+  State<FavoritesScreen> createState() => _FavoritesScreenState();
+}
+
+class _FavoritesScreenState extends State<FavoritesScreen> {
+  final _uid = FirebaseAuthService.instance.currentUser?.uid;
+
+  Future<void> _deleteWithBiometric(String trackId) async {
+    final success = await BiometricService.instance.authenticate(
+      reason: 'Please authenticate to delete this favorite',
+    );
+    if (success && _uid != null) {
+      await FirestoreService.instance.removeFavorite(_uid!, trackId);
+    } else if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Authentication failed. Cannot delete track.')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +79,7 @@ class FavoritesScreen extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: AppColors.surfaceContainerLow,
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: AppColors.outlineVariant.withOpacity(0.15)),
+                          border: Border.all(color: AppColors.outlineVariant.withValues(alpha: 0.15)),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -100,79 +124,96 @@ class FavoritesScreen extends StatelessWidget {
   }
 
   Widget _buildTrackList(BuildContext context) {
-    return Column(
-      children: [
-        Row(
+    if (_uid == null) return const Center(child: Text("Please log in."));
+    
+    return StreamBuilder<List<Track>>(
+      stream: FirestoreService.instance.favoritesStream(_uid!),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        
+        final tracks = snapshot.data ?? [];
+        if (tracks.isEmpty) {
+           return const Text("No favorites added yet.");
+        }
+
+        return Column(
           children: [
-            const Expanded(flex: 2, child: Text('TRACK', style: TextStyle(color: AppColors.outline, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 2))),
-            if (MediaQuery.of(context).size.width > 600)
-              const Expanded(flex: 1, child: Text('ALBUM', style: TextStyle(color: AppColors.outline, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 2))),
-            const Text('DURATION', style: TextStyle(color: AppColors.outline, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 2)),
-            const SizedBox(width: 48), // Padding for delete icon space
+            Row(
+              children: [
+                const Expanded(flex: 2, child: Text('TRACK', style: TextStyle(color: AppColors.outline, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 2))),
+                if (MediaQuery.of(context).size.width > 600)
+                  const Expanded(flex: 1, child: Text('GENRE', style: TextStyle(color: AppColors.outline, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 2))),
+                const Text('DURATION', style: TextStyle(color: AppColors.outline, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 2)),
+                const SizedBox(width: 48), // Padding for delete icon space
+              ],
+            ),
+            const SizedBox(height: 16),
+            ...tracks.map((track) => _buildTrackItem(context, track)),
           ],
-        ),
-        const SizedBox(height: 16),
-        _buildTrackItem(context, 'Neon Echoes', 'Solaris Drift', 'Cybernetic Dreams', '03:42', 'https://lh3.googleusercontent.com/aida-public/AB6AXuCQrviwKBcxX07q4ddg5thBRmsFpWOLyD4Mg3gmBDZpg800GJvfLHywa5WvtW4RK5UedVm34lXQjxQmizvRzW-Zq2e8L4sFHh-Ofpc4omHgcb7webuZbSzHifJVXSgkwuv4IuwfnSYTamNR3CVbdeyYMJYCqK6oLYgsJq73YXGPBWRNo8oyk4IkfyvtTAMGstJ-GxKD2dGVEWE77qOKnZeu8bk5Fy61JH3OBXkRz-EeBN3ur8rqTWtXZlWSEcZsRDGYZF51lMyWAww'),
-        _buildTrackItem(context, 'Midnight Rain', 'Luna Ray', 'After Hours', '04:15', 'https://lh3.googleusercontent.com/aida-public/AB6AXuCa7fdnPLapq5qxCSaOnkECqib0KGHdrmHQDtrvtXrR1DijQhojQN_Ndp6tF-zdHqdY4JCtZbVsRZojLW5utiUIGlnef0yymJRRZmHD0chTBx9i952sIvVDD3aMnqPFlQFnjzdxOAysqIv2YjqXLJFXKilHbto8bp57Xt-W2OSP6QuaJme1YkIPXniRx_vXb9-NddfMKPXtpoSSKEu_fcFK_C5FS2XP_s35nufjp3popb8hFdNoe8bifpV0sqBUku0ngRXz3teE-sw'),
-        _buildTrackItem(context, 'Velvet Sky', 'The Orchids', 'Botanical Beats', '02:58', 'https://lh3.googleusercontent.com/aida-public/AB6AXuBaHMYbT47xRFIAYO_fKSqsMqfVJuAJv8KX6w3eDgopU-Zcnxoyz2hATESDeM6smlQRi7PULiN9UoZTk4fea24yjBtqrY2AsTHILHZ83J4OWNwnxcKrrPBrMG0ezbkKzUWuwDp3AJbSU17Myt9y5ambFI6Il1zmTLPYsd_FpouA6uxFs6gIQVTZlycaIjX_Z29WyoMQnXStUYd3M2jLFWSmYi8nv6pNmzNHo9Dysr3J00yN4Gp1YnazII1lr3sbM0ahbGzSwrUeGis'),
-        _buildTrackItem(context, 'Static Pulse', 'Frequency X', 'Signal Loss', '05:22', 'https://lh3.googleusercontent.com/aida-public/AB6AXuAAtTiaw1hnSyjd4BfCsq5zCoNcnpJdGAcbTxICOtv76zf7g5J_X4EyHO1FdoDAtsPu67ve6bI5JSoPGQQ2-x6RdVHN9N-lzy-YPrWkgz-HCDhxB1H3zb0tGj0ed1oWAhzcsYkC24IZgwiIUBMKI93_8w0j5g8LdRbWTOFM8KJePs8Hc_6X1Ecs3DWMmTMqNqSejG3tdOXBa0fb4UZsjMK5qapuF-losvqvHquSfic3NHYfQfNkYVQhVF6Sxo9N8Dc2tBUSnMkcPaQ'),
-      ],
+        );
+      }
     );
   }
 
-  Widget _buildTrackItem(BuildContext context, String trackName, String artistName, String albumName, String duration, String imageUrl) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            flex: 2,
-            child: Row(
+  Widget _buildTrackItem(BuildContext context, Track track) {
+    return GestureDetector(
+      onTap: () => AudioPlayerService.instance.playTrack(track),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.surfaceContainerLow,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              flex: 2,
+              child: Row(
+                children: [
+                  Container(
+                    width: 64,
+                    height: 64,
+                    decoration: BoxDecoration(
+                      color: AppColors.surfaceContainerHigh,
+                      borderRadius: BorderRadius.circular(4),
+                      image: track.coverUrl.isNotEmpty ? DecorationImage(image: NetworkImage(track.coverUrl), fit: BoxFit.cover) : null,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(track.title, style: Theme.of(context).textTheme.titleMedium, overflow: TextOverflow.ellipsis),
+                        Text(track.artist, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.onSurfaceVariant), overflow: TextOverflow.ellipsis),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (MediaQuery.of(context).size.width > 600)
+              Expanded(
+                flex: 1,
+                child: Text(track.genre, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.onSurfaceVariant, fontStyle: FontStyle.italic)),
+              ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Container(
-                  width: 64,
-                  height: 64,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(4),
-                    image: DecorationImage(image: NetworkImage(imageUrl), fit: BoxFit.cover),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(trackName, style: Theme.of(context).textTheme.titleMedium, overflow: TextOverflow.ellipsis),
-                      Text(artistName, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.onSurfaceVariant), overflow: TextOverflow.ellipsis),
-                    ],
-                  ),
+                Text('--:--', style: Theme.of(context).textTheme.labelSmall),
+                const SizedBox(width: 24),
+                IconButton(
+                  icon: const Icon(Icons.delete_outline, color: AppColors.outline),
+                  onPressed: () => _deleteWithBiometric(track.id),
+                  hoverColor: AppColors.error.withValues(alpha: 0.1),
                 ),
               ],
-            ),
-          ),
-          if (MediaQuery.of(context).size.width > 600)
-            Expanded(
-              flex: 1,
-              child: Text(albumName, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.onSurfaceVariant, fontStyle: FontStyle.italic)),
-            ),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(duration, style: Theme.of(context).textTheme.labelSmall),
-              const SizedBox(width: 24),
-              IconButton(
-                icon: const Icon(Icons.delete_outline, color: AppColors.outline),
-                onPressed: () {},
-                hoverColor: AppColors.error.withOpacity(0.1),
-              ),
-            ],
-          )
-        ],
+            )
+          ],
+        ),
       ),
     );
   }

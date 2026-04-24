@@ -27,9 +27,14 @@ dependencies:
   just_audio: ^0.9.40
   audio_service: ^0.18.15
   just_audio_background: ^0.0.1-beta.13
+  audio_session: ^0.1.18
 
-  # Networking
+  # Networking & Auth
   http: ^1.2.1
+  flutter_web_auth_2: ^3.1.2
+
+  # State Management
+  provider: ^6.1.1
 
   # Local storage
   shared_preferences: ^2.3.2

@@ -7,7 +7,7 @@ import '../../core/services/biometric_service.dart';
 import 'dart:math' as math;
 
 class GatewayScreen extends StatefulWidget {
-  const GatewayScreen({Key? key}) : super(key: key);
+  const GatewayScreen({super.key});
 
   @override
   State<GatewayScreen> createState() => _GatewayScreenState();
@@ -127,7 +127,7 @@ class _GatewayScreenState extends State<GatewayScreen>
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.5),
+                    color: Colors.black.withValues(alpha: 0.5),
                     blurRadius: 20,
                     offset: const Offset(0, 10),
                   ),
@@ -175,7 +175,7 @@ class _GatewayScreenState extends State<GatewayScreen>
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: _ringColor.withOpacity(0.2),
+                          color: _ringColor.withValues(alpha: 0.2),
                           blurRadius: 80,
                           spreadRadius: 10,
                         ),
@@ -192,7 +192,7 @@ class _GatewayScreenState extends State<GatewayScreen>
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(
-                                color: _ringColor.withOpacity(0.2)),
+                                color: _ringColor.withValues(alpha: 0.2)),
                           ),
                           child: Center(
                             child: Container(
@@ -201,7 +201,7 @@ class _GatewayScreenState extends State<GatewayScreen>
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 border: Border.all(
-                                    color: AppColors.secondary.withOpacity(0.1)),
+                                    color: AppColors.secondary.withValues(alpha: 0.1)),
                               ),
                               child: Center(
                                 child: _isAuthenticating
@@ -215,7 +215,7 @@ class _GatewayScreenState extends State<GatewayScreen>
                                         color: _ringColor,
                                         shadows: [
                                           Shadow(
-                                            color: _ringColor.withOpacity(0.6),
+                                            color: _ringColor.withValues(alpha: 0.6),
                                             blurRadius: 15,
                                           ),
                                         ],
@@ -234,14 +234,13 @@ class _GatewayScreenState extends State<GatewayScreen>
                     builder: (_, child) {
                       return Transform.rotate(
                         angle: _controller.value * 2 * math.pi,
-                        child: Container(
+                        child: SizedBox(
                           width: 192,
                           height: 192,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border(
-                              top: BorderSide(
-                                  color: _ringColor.withOpacity(0.4), width: 2),
+                          child: CustomPaint(
+                            painter: _ArcPainter(
+                              color: _ringColor.withValues(alpha: 0.4),
+                              strokeWidth: 2,
                             ),
                           ),
                         ),
@@ -327,7 +326,7 @@ class _GatewayScreenState extends State<GatewayScreen>
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: [
                             BoxShadow(
-                              color: AppColors.primary.withOpacity(0.1),
+                              color: AppColors.primary.withValues(alpha: 0.1),
                               blurRadius: 20,
                               offset: const Offset(0, 10),
                             ),
@@ -412,4 +411,28 @@ class _GatewayScreenState extends State<GatewayScreen>
       ),
     );
   }
+}
+
+class _ArcPainter extends CustomPainter {
+  final Color color;
+  final double strokeWidth;
+
+  _ArcPainter({required this.color, required this.strokeWidth});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth
+      ..strokeCap = StrokeCap.round;
+
+    final rect = Rect.fromLTWH(0, 0, size.width, size.height);
+    // Draw a quarter-circle arc
+    canvas.drawArc(rect, -math.pi / 2, math.pi / 2, false, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _ArcPainter oldDelegate) =>
+      color != oldDelegate.color || strokeWidth != oldDelegate.strokeWidth;
 }

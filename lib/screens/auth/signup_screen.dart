@@ -6,7 +6,7 @@ import '../../widgets/glass_card.dart';
 import '../../core/services/firebase_auth_service.dart';
 
 class SignupScreen extends StatefulWidget {
-  const SignupScreen({Key? key}) : super(key: key);
+  const SignupScreen({super.key});
 
   @override
   State<SignupScreen> createState() => _SignupScreenState();
@@ -108,7 +108,7 @@ class _SignupScreenState extends State<SignupScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: AppColors.error.withOpacity(0.9),
+        backgroundColor: AppColors.error.withValues(alpha: 0.9),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
@@ -194,10 +194,10 @@ class _SignupScreenState extends State<SignupScreen> {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
-            color: AppColors.surfaceVariant.withOpacity(0.4),
+            color: AppColors.surfaceVariant.withValues(alpha: 0.4),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-                color: AppColors.outlineVariant.withOpacity(0.15)),
+                color: AppColors.outlineVariant.withValues(alpha: 0.15)),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -381,7 +381,7 @@ class _SignupScreenState extends State<SignupScreen> {
           decoration: InputDecoration(
             hintText: hint,
             hintStyle:
-                TextStyle(color: AppColors.outline.withOpacity(0.5)),
+                TextStyle(color: AppColors.outline.withValues(alpha: 0.5)),
             suffixIcon: suffix != null
                 ? GestureDetector(
                     onTap: onSuffixTap,
@@ -389,7 +389,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   )
                 : null,
             filled: true,
-            fillColor: AppColors.surfaceContainerHigh.withOpacity(0.5),
+            fillColor: AppColors.surfaceContainerHigh.withValues(alpha: 0.5),
             contentPadding:
                 const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
             border: OutlineInputBorder(

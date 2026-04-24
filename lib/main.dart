@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:just_audio_background/just_audio_background.dart';
+import 'package:provider/provider.dart';
 
 import 'theme/app_theme.dart';
 import 'screens/auth/gateway_screen.dart';
@@ -9,37 +10,59 @@ import 'screens/auth/signup_screen.dart';
 import 'screens/auth/forgot_password_screen.dart';
 import 'navigation/main_scaffold.dart';
 import 'core/services/audio_player_service.dart';
+import 'core/providers/music_provider.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // NOTE: After running `flutterfire configure`, uncomment the import below
 // and pass `options: DefaultFirebaseOptions.currentPlatform` to initializeApp.
 // ─────────────────────────────────────────────────────────────────────────────
-// import 'firebase_options.dart';
+import 'firebase_options.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // ── Firebase init ──────────────────────────────────────────────────────────
-  await Firebase.initializeApp(
-    // options: DefaultFirebaseOptions.currentPlatform, // ← uncomment after flutterfire configure
-  );
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } catch (e) {
+    debugPrint('⚠️ Firebase init failed (using placeholder config?): $e');
+    debugPrint('   The app will run but Firebase features (auth, Firestore) won\'t work.');
+  }
 
   // ── Background audio init (must come before runApp) ───────────────────────
-  await JustAudioBackground.init(
-    androidNotificationChannelId: 'com.melody.app.melody.channel.audio',
-    androidNotificationChannelName: 'Melody Audio',
-    androidNotificationOngoing: true,
-    androidShowNotificationBadge: true,
-  );
+  try {
+    await JustAudioBackground.init(
+      androidNotificationChannelId: 'com.melody.app.melody.channel.audio',
+      androidNotificationChannelName: 'Melody Audio',
+      androidNotificationOngoing: true,
+      androidShowNotificationBadge: true,
+    );
+  } catch (e) {
+    debugPrint('⚠️ JustAudioBackground init failed: $e');
+    debugPrint('   Background audio notifications may not work.');
+  }
 
   // ── Singleton audio player init ──────────────────────────────────────────
-  await AudioPlayerService.instance.init();
+  try {
+    await AudioPlayerService.instance.init();
+  } catch (e) {
+    debugPrint('⚠️ AudioPlayerService init failed: $e');
+  }
 
-  runApp(const MelodyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => MusicProvider()),
+      ],
+      child: const MelodyApp(),
+    ),
+  );
 }
 
 class MelodyApp extends StatelessWidget {
-  const MelodyApp({Key? key}) : super(key: key);
+  const MelodyApp({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -6,7 +6,7 @@ import '../../widgets/glass_card.dart';
 import '../../core/services/firebase_auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -55,7 +55,7 @@ class _LoginScreenState extends State<LoginScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: AppColors.error.withOpacity(0.9),
+        backgroundColor: AppColors.error.withValues(alpha: 0.9),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
@@ -83,7 +83,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.primary.withOpacity(0.3),
+                        color: AppColors.primary.withValues(alpha: 0.3),
                         blurRadius: 30,
                       )
                     ],
@@ -127,7 +127,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         decoration: InputDecoration(
                           hintText: 'name@example.com',
                           hintStyle: TextStyle(
-                              color: AppColors.outline.withOpacity(0.5)),
+                              color: AppColors.outline.withValues(alpha: 0.5)),
                           prefixIcon: const Icon(Icons.mail_outline,
                               color: AppColors.outline),
                           filled: true,
@@ -141,7 +141,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(30),
                             borderSide: BorderSide(
-                                color: AppColors.secondary.withOpacity(0.3)),
+                                color: AppColors.secondary.withValues(alpha: 0.3)),
                           ),
                         ),
                       ),
@@ -183,7 +183,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         decoration: InputDecoration(
                           hintText: '••••••••',
                           hintStyle: TextStyle(
-                              color: AppColors.outline.withOpacity(0.5)),
+                              color: AppColors.outline.withValues(alpha: 0.5)),
                           prefixIcon: const Icon(Icons.lock_outline,
                               color: AppColors.outline),
                           suffixIcon: IconButton(
@@ -207,7 +207,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(30),
                             borderSide: BorderSide(
-                                color: AppColors.secondary.withOpacity(0.3)),
+                                color: AppColors.secondary.withValues(alpha: 0.3)),
                           ),
                         ),
                       ),
@@ -231,7 +231,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             borderRadius: BorderRadius.circular(16),
                             boxShadow: [
                               BoxShadow(
-                                  color: AppColors.primary.withOpacity(0.2),
+                                  color: AppColors.primary.withValues(alpha: 0.2),
                                   blurRadius: 30,
                                   offset: const Offset(0, 10)),
                             ],
@@ -294,7 +294,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: Container(
                             height: 1,
                             color:
-                                AppColors.outlineVariant.withOpacity(0.3))),
+                                AppColors.outlineVariant.withValues(alpha: 0.3))),
                     const Padding(
                       padding: EdgeInsets.symmetric(horizontal: 16),
                       child: Text('OR CONTINUE WITH',
@@ -307,7 +307,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: Container(
                             height: 1,
                             color:
-                                AppColors.outlineVariant.withOpacity(0.3))),
+                                AppColors.outlineVariant.withValues(alpha: 0.3))),
                   ],
                 ),
 
