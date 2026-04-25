@@ -23,7 +23,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       reason: 'Please authenticate to delete this favorite',
     );
     if (success && _uid != null) {
-      await FirestoreService.instance.removeFavorite(_uid!, trackId);
+      await FirestoreService.instance.removeFavorite(_uid, trackId);
     } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Authentication failed. Cannot delete track.')),
@@ -128,7 +128,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     if (_uid == null) return const Center(child: Text("Please log in."));
     
     return StreamBuilder<List<Track>>(
-      stream: FirestoreService.instance.favoritesStream(_uid!),
+      stream: FirestoreService.instance.favoritesStream(_uid),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());

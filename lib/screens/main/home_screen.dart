@@ -24,7 +24,11 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() => context.read<MusicProvider>().loadPopularTracks());
+    Future.microtask(() {
+      if (mounted) {
+        context.read<MusicProvider>().loadPopularTracks();
+      }
+    });
   }
 
   @override
@@ -427,7 +431,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildRecentTrack(BuildContext context, Track track, {bool isFavorite = false}) {
+  Widget _buildRecentTrack(BuildContext context, Track track) {
     return GestureDetector(
       onTap: () => AudioPlayerService.instance.playTrack(track),
       child: Container(

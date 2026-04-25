@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'dart:developer';
 import '../models/track.dart';
 
 class JamendoApi {
@@ -30,7 +31,7 @@ class JamendoApi {
         return results.map((json) => Track.fromJamendoJson(json as Map<String, dynamic>)).toList();
       }
     } catch (e) {
-      print('Jamendo API error: $e');
+      log('Jamendo API error: $e');
     }
     return [];
   }

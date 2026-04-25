@@ -1,6 +1,5 @@
 import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'dart:developer';
 
 class JamendoAuthService {
   static const clientId = 'ad40341f';
@@ -23,7 +22,7 @@ class JamendoAuthService {
         return params['access_token'];
       }
     } catch (e) {
-      print('Auth error: $e');
+      log('Auth error: $e');
     }
     return null;
   }
