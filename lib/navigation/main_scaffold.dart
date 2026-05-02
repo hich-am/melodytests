@@ -4,10 +4,14 @@ import '../theme/app_theme.dart';
 import '../screens/main/home_screen.dart';
 import '../screens/main/dashboard_screen.dart';
 import '../screens/main/favorites_screen.dart';
-// Note: Placeholder for ProfileScreen if exists, currently we can map to Dashboard.
+import '../screens/main/player_screen.dart'; // <--- Added import
 
 class MainScaffold extends StatefulWidget {
   const MainScaffold({super.key});
+
+  static _MainScaffoldState? of(BuildContext context) {
+    return context.findAncestorStateOfType<_MainScaffoldState>();
+  }
 
   @override
   State<MainScaffold> createState() => _MainScaffoldState();
@@ -15,10 +19,21 @@ class MainScaffold extends StatefulWidget {
 
 class _MainScaffoldState extends State<MainScaffold> {
   int _currentIndex = 0;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  void changeTab(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+  }
+
+  void openDrawer() {
+    _scaffoldKey.currentState?.openDrawer();
+  }
 
   final List<Widget> _screens = [
     const HomeScreen(),
-    const Center(child: Text('Player Screen Placeholder', style: TextStyle(color: Colors.white))),
+    const PlayerScreen(), // <--- Replaced placeholder
     const FavoritesScreen(),
     const DashboardScreen(), // Mapping profile icon to Dashboard since dashboard has user stats
   ];
@@ -26,6 +41,8 @@ class _MainScaffoldState extends State<MainScaffold> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
+      drawer: _buildDrawer(),
       body: Stack(
         children: [
           // Current Tab
@@ -64,6 +81,68 @@ class _MainScaffoldState extends State<MainScaffold> {
               ),
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDrawer() {
+    return Drawer(
+      backgroundColor: AppColors.surface,
+      child: Column(
+        children: [
+          DrawerHeader(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [AppColors.primary, AppColors.primaryContainer],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.music_note, size: 48, color: AppColors.onPrimaryFixed),
+                  const SizedBox(height: 16),
+                  Text('MELODY', style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: AppColors.onPrimaryFixed, fontWeight: FontWeight.w900, letterSpacing: 4)),
+                ],
+              ),
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.home_outlined, color: AppColors.outline),
+            title: const Text('Home', style: TextStyle(color: AppColors.onSurface)),
+            onTap: () {
+              Navigator.pop(context);
+              changeTab(0);
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.person_outline, color: AppColors.outline),
+            title: const Text('Profile', style: TextStyle(color: AppColors.onSurface)),
+            onTap: () {
+              Navigator.pop(context);
+              changeTab(3);
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.settings_outlined, color: AppColors.outline),
+            title: const Text('Settings', style: TextStyle(color: AppColors.onSurface)),
+            onTap: () {
+              Navigator.pop(context);
+            },
+          ),
+          const Spacer(),
+          ListTile(
+            leading: const Icon(Icons.logout, color: AppColors.error),
+            title: const Text('Log Out', style: TextStyle(color: AppColors.error)),
+            onTap: () {
+              // TODO: Implement Auth Logout
+              Navigator.pop(context);
+            },
+          ),
+          const SizedBox(height: 32),
         ],
       ),
     );

@@ -107,12 +107,17 @@ class _GatewayScreenState extends State<GatewayScreen>
   }
 
   void _navigateAfterAuth() {
-    final user = FirebaseAuth.instance.currentUser;
     if (!mounted) return;
-    Navigator.pushReplacementNamed(
-      context,
-      user != null ? '/main' : '/login',
-    );
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      Navigator.pushReplacementNamed(
+        context,
+        user != null ? '/main' : '/login',
+      );
+    } catch (e) {
+      debugPrint('⚠️ Firebase auth check failed: $e');
+      Navigator.pushReplacementNamed(context, '/login');
+    }
   }
 
   @override

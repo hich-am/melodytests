@@ -7,6 +7,7 @@ import '../../core/services/firebase_auth_service.dart';
 import '../../core/services/biometric_service.dart';
 import '../../core/services/audio_player_service.dart';
 import '../../core/models/track.dart';
+import '../../navigation/main_scaffold.dart';
 
 class FavoritesScreen extends StatefulWidget {
   const FavoritesScreen({super.key});
@@ -43,7 +44,10 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
               backgroundColor: Colors.transparent,
               elevation: 0,
               pinned: true,
-              leading: IconButton(icon: const Icon(Icons.menu, color: AppColors.primary), onPressed: () {}),
+              leading: IconButton(
+                icon: const Icon(Icons.menu, color: AppColors.primary), 
+                onPressed: () => MainScaffold.of(context)?.openDrawer(),
+              ),
               title: const Text('MELODY', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w900, letterSpacing: 2)),
               actions: [
                 if (isWide) const Center(child: Text('Favorites', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold))),
@@ -128,6 +132,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     if (_uid == null) return const Center(child: Text("Please log in."));
     
     return StreamBuilder<List<Track>>(
+      initialData: const <Track>[],
       stream: FirestoreService.instance.favoritesStream(_uid),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {

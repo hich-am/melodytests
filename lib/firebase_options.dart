@@ -41,48 +41,46 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyAm2VuF6_YmmXlmL7ZSDvmjyrEfCkQ7WPQ',
-    appId: '1:989595330356:web:a097030fcc731e9a8f2761',
-    messagingSenderId: '989595330356',
-    projectId: 'melody-projet',
-    authDomain: 'melody-projet.firebaseapp.com',
-    storageBucket: 'melody-projet.firebasestorage.app',
-    measurementId: 'G-SGX62KYHGE',
+    apiKey: 'AIzaSyCZJAWUi3Iwy6GuFoJqjOiIyo3a3S6BQvU',
+    appId: '1:1042981248112:web:967996235bc05de669a8b5',
+    messagingSenderId: '1042981248112',
+    projectId: 'melodyapp-18f75',
+    authDomain: 'melodyapp-18f75.firebaseapp.com',
+    storageBucket: 'melodyapp-18f75.firebasestorage.app',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyAANnl6z0sw8Gb2QWOma3Mc-IjENRaUeqg',
-    appId: '1:989595330356:android:891a44b700a621d38f2761',
-    messagingSenderId: '989595330356',
-    projectId: 'melody-projet',
-    storageBucket: 'melody-projet.firebasestorage.app',
+    apiKey: 'AIzaSyD2-n9Lq6e_jHotcfEH8jOwbQvD3iPL38Q',
+    appId: '1:1042981248112:android:44320c148e19c65469a8b5',
+    messagingSenderId: '1042981248112',
+    projectId: 'melodyapp-18f75',
+    storageBucket: 'melodyapp-18f75.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyB3vGMl0lx7chRBjiPZxqfKV2wcOEhfVLw',
-    appId: '1:989595330356:ios:4a85ae333cf8e8e58f2761',
-    messagingSenderId: '989595330356',
-    projectId: 'melody-projet',
-    storageBucket: 'melody-projet.firebasestorage.app',
+    apiKey: 'AIzaSyCZJAWUi3Iwy6GuFoJqjOiIyo3a3S6BQvU',
+    appId: '1:1042981248112:android:44320c148e19c65469a8b5',
+    messagingSenderId: '1042981248112',
+    projectId: 'melodyapp-18f75',
+    storageBucket: 'melodyapp-18f75.firebasestorage.app',
     iosBundleId: 'com.melody.app.melody',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyB3vGMl0lx7chRBjiPZxqfKV2wcOEhfVLw',
-    appId: '1:989595330356:ios:4a85ae333cf8e8e58f2761',
-    messagingSenderId: '989595330356',
-    projectId: 'melody-projet',
-    storageBucket: 'melody-projet.firebasestorage.app',
+    apiKey: 'AIzaSyCZJAWUi3Iwy6GuFoJqjOiIyo3a3S6BQvU',
+    appId: '1:1042981248112:android:44320c148e19c65469a8b5',
+    messagingSenderId: '1042981248112',
+    projectId: 'melodyapp-18f75',
+    storageBucket: 'melodyapp-18f75.firebasestorage.app',
     iosBundleId: 'com.melody.app.melody',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyAm2VuF6_YmmXlmL7ZSDvmjyrEfCkQ7WPQ',
-    appId: '1:989595330356:web:e90e8cd74ff641948f2761',
-    messagingSenderId: '989595330356',
-    projectId: 'melody-projet',
-    authDomain: 'melody-projet.firebaseapp.com',
-    storageBucket: 'melody-projet.firebasestorage.app',
-    measurementId: 'G-7J6LV0ZNP9',
+    apiKey: 'AIzaSyCZJAWUi3Iwy6GuFoJqjOiIyo3a3S6BQvU',
+    appId: '1:1042981248112:web:967996235bc05de669a8b5',
+    messagingSenderId: '1042981248112',
+    projectId: 'melodyapp-18f75',
+    authDomain: 'melodyapp-18f75.firebaseapp.com',
+    storageBucket: 'melodyapp-18f75.firebasestorage.app',
   );
 }

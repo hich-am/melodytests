@@ -6,6 +6,7 @@ import '../../core/services/stats_service.dart';
 import '../../core/services/firebase_auth_service.dart';
 import 'package:provider/provider.dart';
 import '../../core/providers/music_provider.dart';
+import '../../navigation/main_scaffold.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -26,15 +27,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Future<void> _loadStats() async {
-    final total = await StatsService.instance.getTotalListeningSeconds();
-    final goal = await StatsService.instance.getMonthlyGoalHours();
-    final daily = await StatsService.instance.getDailyMinutesThisMonth();
-    if (mounted) {
-      setState(() {
-        _totalSeconds = total;
-        _goalHours = goal;
-        _dailyMinutes = daily;
-      });
+    try {
+      final total = await StatsService.instance.getTotalListeningSeconds();
+      final goal = await StatsService.instance.getMonthlyGoalHours();
+      final daily = await StatsService.instance.getDailyMinutesThisMonth();
+      if (mounted) {
+        setState(() {
+          _totalSeconds = total;
+          _goalHours = goal;
+          _dailyMinutes = daily;
+        });
+      }
+    } catch (e) {
+      debugPrint('⚠️ Stats loading failed (offline?): $e');
     }
   }
 
@@ -48,7 +53,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
               backgroundColor: Colors.transparent,
               elevation: 0,
               pinned: true,
-              leading: IconButton(icon: const Icon(Icons.menu, color: AppColors.primary), onPressed: () {}),
+              leading: IconButton(
+                icon: const Icon(Icons.menu, color: AppColors.primary), 
+                onPressed: () => MainScaffold.of(context)?.openDrawer(),
+              ),
               title: const Text('MELODY', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w900, letterSpacing: 2)),
               actions: [
                 const CircleAvatar(
@@ -62,21 +70,51 @@ class _DashboardScreenState extends State<DashboardScreen> {
               padding: const EdgeInsets.all(24.0),
               sliver: SliverList(
                 delegate: SliverChildListDelegate([
-                  const SizedBox(height: 16),
-                  Text('Hello, ${FirebaseAuthService.instance.currentUser?.displayName ?? 'User'}', style: Theme.of(context).textTheme.displayMedium),
                   const SizedBox(height: 8),
-                  Text('Ready for your daily soundscape?', style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: AppColors.onSurfaceVariant)),
+                  Row(
+                    children: [
+                      Container(
+                        width: 80,
+                        height: 80,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: AppColors.primary, width: 2),
+                          image: const DecorationImage(
+                            image: NetworkImage('https://lh3.googleusercontent.com/aida-public/AB6AXuD2RUf0361taIWjap8pCT6E9xx_aPCETtzPol369lfjNcA-cgOMVGcJFkU7R7cNKPR0U28Yfy-xSZI2yWO32Sukd7lBT4q2-kXnQQ0Qo9ZKtbyFuPOhpKEkKPbSZn8iPLxfOiQEOLlLowfTG6-38AUKi0k860xkkLCNP7ULg9aigjg0KsjKB3It2166Ods4-JM4NNVUkbcJzqMNgY8occF9FiK0KTFaVASMo_98dTU_eYqmcMQAL0bK9xLZeSv4Fk5erAybwrjH5e0'),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 24),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(FirebaseAuthService.instance.currentUser?.displayName ?? 'Melody User', style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold)),
+                            const SizedBox(height: 4),
+                            Text(FirebaseAuthService.instance.currentUser?.email ?? 'user@melody.app', style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: AppColors.primary)),
+                          ],
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.edit_outlined, color: AppColors.outline),
+                        onPressed: () {},
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: 48),
 
                   // Stats Grid Let's make it responsive
                   if (MediaQuery.of(context).size.width > 800)
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Expanded(flex: 1, child: _buildListeningTimeCard(context)),
-                        const SizedBox(width: 24),
-                        Expanded(flex: 2, child: _buildActivityChartCard(context)),
-                      ],
+                    IntrinsicHeight(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(flex: 1, child: _buildListeningTimeCard(context)),
+                          const SizedBox(width: 24),
+                          Expanded(flex: 2, child: _buildActivityChartCard(context)),
+                        ],
+                      ),
                     )
                   else
                     Column(
@@ -203,7 +241,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 final isPeak = heights[index] > 0.9;
                 return Container(
                   width: 4, // thin bars for 30 items
-                  height: 120 * heights[index].toDouble(),
+                  height: (120 * heights[index].toDouble()).clamp(2.0, 120.0),
                   decoration: BoxDecoration(
                     color: isPeak ? AppColors.primary : AppColors.surfaceContainerHighest,
                     borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),

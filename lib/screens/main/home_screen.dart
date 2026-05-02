@@ -9,6 +9,8 @@ import '../../core/models/track.dart';
 import '../../core/services/audio_player_service.dart';
 import '../../core/services/firestore_service.dart';
 import '../../core/services/firebase_auth_service.dart';
+import '../../navigation/main_scaffold.dart';
+import 'player_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -45,7 +47,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   backgroundColor: Colors.transparent,
                   elevation: 0,
                   pinned: true,
-                  leading: IconButton(icon: const Icon(Icons.menu, color: AppColors.primary), onPressed: () {}),
+                  leading: IconButton(
+                    icon: const Icon(Icons.menu, color: AppColors.primary), 
+                    onPressed: () => MainScaffold.of(context)?.openDrawer(),
+                  ),
                   title: const Text('MELODY', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w900, letterSpacing: 2)),
                   actions: [
                     if (isWide) ...[
@@ -54,9 +59,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       TextButton(onPressed: () {}, child: const Text('Library', style: TextStyle(color: AppColors.outline))),
                     ],
                     const SizedBox(width: 16),
-                    const CircleAvatar(
-                      backgroundColor: AppColors.surfaceContainerHighest,
-                      backgroundImage: NetworkImage('https://lh3.googleusercontent.com/aida-public/AB6AXuCuYNhxW94PVo9l_5D4XY_bP_xSRP5vyN8_TgJnDarc7UnyLdbpSKQJ16ZwPqk46tduJLBO0Fg6tB5aVmK5KIgW96eX58yDvd-KJTrVwEgqF7WGTkHMFlDmTCO6MWvsIWx1b4VuH1WFbl-BHqA8pEU6UM581hx8VKa1SEhpfUpUmR5dcUgzmNSLv5NLO87SQm50-VufjzybxuvEBcJp8Vnw5oR3escltrJofLmeVH_fjEV9eeFLUuef8UnDJNbapk9UazqjPG38yjU'),
+                    GestureDetector(
+                      onTap: () => MainScaffold.of(context)?.changeTab(3),
+                      child: const CircleAvatar(
+                        backgroundColor: AppColors.surfaceContainerHighest,
+                        backgroundImage: NetworkImage('https://lh3.googleusercontent.com/aida-public/AB6AXuCuYNhxW94PVo9l_5D4XY_bP_xSRP5vyN8_TgJnDarc7UnyLdbpSKQJ16ZwPqk46tduJLBO0Fg6tB5aVmK5KIgW96eX58yDvd-KJTrVwEgqF7WGTkHMFlDmTCO6MWvsIWx1b4VuH1WFbl-BHqA8pEU6UM581hx8VKa1SEhpfUpUmR5dcUgzmNSLv5NLO87SQm50-VufjzybxuvEBcJp8Vnw5oR3escltrJofLmeVH_fjEV9eeFLUuef8UnDJNbapk9UazqjPG38yjU'),
+                      ),
                     ),
                     const SizedBox(width: 24),
                   ],
@@ -91,7 +99,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       // Hero Playlist Section
                       if (isWide)
                         Row(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Expanded(flex: 7, child: _buildHeroPlaylist(context)),
                             const SizedBox(width: 32),
@@ -164,8 +172,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   
                   final playing = snapshot.data?.playing ?? false;
                   
-                  return ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const PlayerScreen()),
+                      );
+                    },
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
                     child: BackdropFilter(
                       filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
                       child: Container(
@@ -245,11 +260,17 @@ class _HomeScreenState extends State<HomeScreen> {
                                 
                                 Row(
                                   children: [
-                                    if (isWide) const Icon(Icons.shuffle, color: AppColors.outline),
+                                    if (isWide) IconButton(
+                                      icon: Icon(Icons.shuffle, color: AudioPlayerService.instance.isShuffle ? AppColors.primary : AppColors.outline),
+                                      onPressed: () {
+                                        AudioPlayerService.instance.toggleShuffle();
+                                        setState(() {});
+                                      }
+                                    ),
                                     const SizedBox(width: 16),
                                     IconButton(
                                       icon: const Icon(Icons.skip_previous, color: AppColors.onSurface),
-                                      onPressed: () => AudioPlayerService.instance.seek(Duration.zero)
+                                      onPressed: () => AudioPlayerService.instance.playPrevious()
                                     ),
                                     Container(
                                       width: 48,
@@ -262,7 +283,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ),
                                     IconButton(
                                       icon: const Icon(Icons.skip_next, color: AppColors.onSurface),
-                                      onPressed: () {}
+                                      onPressed: () => AudioPlayerService.instance.playNext()
                                     ),
                                     if (isWide) IconButton(icon: const Icon(Icons.repeat, color: AppColors.outline), onPressed: () => AudioPlayerService.instance.toggleRepeat()),
                                   ],
@@ -294,7 +315,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                     ),
-                  );
+                    ),
+                  ); // closes GestureDetector
                 }
               ),
             ),
@@ -363,7 +385,10 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 16),
             ElevatedButton.icon(
               onPressed: () {
-                if (featured != null) AudioPlayerService.instance.playTrack(featured);
+                if (featured != null) {
+                  final playlist = Provider.of<MusicProvider>(context, listen: false).currentTracks;
+                  AudioPlayerService.instance.playTrack(featured, playlist: playlist);
+                }
               },
               icon: const Icon(Icons.play_arrow, color: Colors.black),
               label: const Text('Play Now', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
@@ -433,7 +458,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildRecentTrack(BuildContext context, Track track) {
     return GestureDetector(
-      onTap: () => AudioPlayerService.instance.playTrack(track),
+      onTap: () {
+        final playlist = Provider.of<MusicProvider>(context, listen: false).currentTracks;
+        AudioPlayerService.instance.playTrack(track, playlist: playlist);
+      },
       child: Container(
         margin: const EdgeInsets.only(bottom: 8),
         padding: const EdgeInsets.all(16),
@@ -472,9 +500,10 @@ class _HomeScreenState extends State<HomeScreen> {
             Row(
               children: [
                 StreamBuilder<List<Track>>(
+                  initialData: const <Track>[],
                   stream: FirebaseAuthService.instance.currentUser != null
                       ? FirestoreService.instance.favoritesStream(FirebaseAuthService.instance.currentUser!.uid)
-                      : const Stream.empty(),
+                      : Stream.value(const <Track>[]),
                   builder: (context, snapshot) {
                     final isFav = snapshot.data?.any((t) => t.id == track.id) ?? false;
                     return IconButton(

@@ -21,27 +21,22 @@ import 'firebase_options.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // ── Background audio init (MUST come before Firebase) ──────────────────
+  await JustAudioBackground.init(
+    androidNotificationChannelId: 'com.melody.app.melody.channel.audio',
+    androidNotificationChannelName: 'Melody Audio',
+    androidNotificationOngoing: true,
+    androidShowNotificationBadge: true,
+  );
+
   // ── Firebase init ──────────────────────────────────────────────────────────
   try {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+    debugPrint('✅ Firebase initialized successfully');
   } catch (e) {
-    debugPrint('⚠️ Firebase init failed (using placeholder config?): $e');
-    debugPrint('   The app will run but Firebase features (auth, Firestore) won\'t work.');
-  }
-
-  // ── Background audio init (must come before runApp) ───────────────────────
-  try {
-    await JustAudioBackground.init(
-      androidNotificationChannelId: 'com.melody.app.melody.channel.audio',
-      androidNotificationChannelName: 'Melody Audio',
-      androidNotificationOngoing: true,
-      androidShowNotificationBadge: true,
-    );
-  } catch (e) {
-    debugPrint('⚠️ JustAudioBackground init failed: $e');
-    debugPrint('   Background audio notifications may not work.');
+    debugPrint('⚠️ Firebase init failed: $e');
   }
 
   // ── Singleton audio player init ──────────────────────────────────────────

@@ -13,13 +13,19 @@ class AudioPlayerService {
   Track? _currentTrack;
   DateTime? _playStartedAt;
   bool _isRepeat = false;
+  bool _isShuffle = false;
+  
+  List<Track> _playlist = [];
+  int _currentIndex = -1;
 
   // ─────────────────────────────────────────────────────
   // Getters
   // ─────────────────────────────────────────────────────
 
   Track? get currentTrack => _currentTrack;
+  List<Track> get currentPlaylist => _playlist;
   bool get isRepeat => _isRepeat;
+  bool get isShuffle => _isShuffle;
   bool get isPlaying => _player.playing;
 
   Stream<PlayerState> get playerStateStream => _player.playerStateStream;
@@ -39,6 +45,7 @@ class AudioPlayerService {
           _player.play();
         } else {
           _recordListeningTime();
+          playNext(); // Auto-play next track when finished
         }
       }
     });
@@ -48,10 +55,14 @@ class AudioPlayerService {
   // Playback control
   // ─────────────────────────────────────────────────────
 
-  Future<void> playTrack(Track track) async {
+  Future<void> playTrack(Track track, {List<Track>? playlist}) async {
     // Record time for previous track before switching
     _recordListeningTime();
 
+    if (playlist != null) {
+      _playlist = playlist;
+    }
+    _currentIndex = _playlist.indexWhere((t) => t.id == track.id);
     _currentTrack = track;
     _playStartedAt = DateTime.now();
 
@@ -68,6 +79,38 @@ class AudioPlayerService {
 
     await _player.setAudioSource(audioSource);
     await _player.play();
+  }
+  
+  Future<void> playNext() async {
+    if (_playlist.isEmpty) return;
+    
+    int nextIndex;
+    if (_isShuffle) {
+      final listWithoutCurrent = List<int>.generate(_playlist.length, (i) => i)..remove(_currentIndex);
+      listWithoutCurrent.shuffle();
+      nextIndex = listWithoutCurrent.isNotEmpty ? listWithoutCurrent.first : _currentIndex;
+    } else {
+      nextIndex = (_currentIndex + 1) % _playlist.length;
+    }
+    
+    await playTrack(_playlist[nextIndex]);
+  }
+
+  Future<void> playPrevious() async {
+    if (_playlist.isEmpty) {
+      await _player.seek(Duration.zero);
+      return;
+    }
+    
+    // If we've played more than 3 seconds, previous goes to start of current track
+    if (_player.position.inSeconds > 3) {
+      await _player.seek(Duration.zero);
+      return;
+    }
+    
+    int prevIndex = (_currentIndex - 1) % _playlist.length;
+    if (prevIndex < 0) prevIndex = _playlist.length - 1;
+    await playTrack(_playlist[prevIndex]);
   }
 
   Future<void> pause() async {
@@ -95,6 +138,10 @@ class AudioPlayerService {
   void toggleRepeat() {
     _isRepeat = !_isRepeat;
     _player.setLoopMode(_isRepeat ? LoopMode.one : LoopMode.off);
+  }
+  
+  void toggleShuffle() {
+    _isShuffle = !_isShuffle;
   }
 
   Future<void> dispose() async {
