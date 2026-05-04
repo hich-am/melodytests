@@ -18,9 +18,6 @@ class AudioPlayerService {
   List<Track> _playlist = [];
   int _currentIndex = -1;
 
-  // ─────────────────────────────────────────────────────
-  // Getters
-  // ─────────────────────────────────────────────────────
 
   Track? get currentTrack => _currentTrack;
   List<Track> get currentPlaylist => _playlist;

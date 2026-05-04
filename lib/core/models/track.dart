@@ -29,7 +29,6 @@ class Track {
     );
   }
 
-  // To support legacy parts of the app during transition if needed
   factory Track.fromFirestoreMap(String mapId, Map<String, dynamic> data) {
     return Track(
       id: mapId,
