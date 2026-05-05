@@ -53,25 +53,43 @@ class StatsService {
     return total;
   }
 
-  /// Minutes listened per day for the current month.
-  /// Returns a map where the key is the day-of-month (1–31).
-  Future<Map<int, double>> getDailyMinutesThisMonth() async {
+  /// Last 30 days minutes
+  Future<Map<DateTime, double>> getLast30DaysMinutes() async {
     final uid = _auth.currentUser?.uid;
-    final Map<int, double> result = {};
+    final Map<DateTime, double> result = {};
     if (uid == null) return result;
 
     final snap = await _db.collection('users').doc(uid).collection('stats').doc('tracking').get();
     final data = snap.data() ?? {};
 
     final now = DateTime.now();
+    for (int i = 0; i < 30; i++) {
+      final date = now.subtract(Duration(days: 29 - i));
+      final dateKey = DateTime(date.year, date.month, date.day);
+      final key = _dailyKey(dateKey);
+      final seconds = (data[key] as num?)?.toInt() ?? 0;
+      result[dateKey] = seconds / 60.0;
+    }
+    return result;
+  }
+
+  /// Total listening seconds for the current month.
+  Future<int> getThisMonthTotalSeconds() async {
+    final uid = _auth.currentUser?.uid;
+    if (uid == null) return 0;
+
+    final snap = await _db.collection('users').doc(uid).collection('stats').doc('tracking').get();
+    final data = snap.data() ?? {};
+
+    final now = DateTime.now();
     final daysInMonth = DateTime(now.year, now.month + 1, 0).day;
+    int total = 0;
     for (int day = 1; day <= daysInMonth; day++) {
       final date = DateTime(now.year, now.month, day);
       final key = _dailyKey(date);
-      final seconds = (data[key] as num?)?.toInt() ?? 0;
-      result[day] = seconds / 60.0;
+      total += (data[key] as num?)?.toInt() ?? 0;
     }
-    return result;
+    return total;
   }
 
   /// Play counts for all tracked tracks, sorted descending.
@@ -128,10 +146,8 @@ class StatsService {
 
   /// Returns total listening hours for the current month.
   Future<double> getThisMonthListeningHours() async {
-    final dailyMinutes = await getDailyMinutesThisMonth();
-    final totalMinutes =
-        dailyMinutes.values.fold<double>(0.0, (a, b) => a + b);
-    return totalMinutes / 60.0;
+    final totalSeconds = await getThisMonthTotalSeconds();
+    return totalSeconds / 3600.0;
   }
 
   /// Formatted string like "4h 23m"

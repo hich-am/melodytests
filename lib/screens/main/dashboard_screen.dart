@@ -17,8 +17,9 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   int _totalSeconds = 0;
+  int _thisMonthSeconds = 0;
   int _goalHours = 20;
-  Map<int, double> _dailyMinutes = {};
+  Map<DateTime, double> _last30DaysMinutes = {};
 
   @override
   void initState() {
@@ -26,16 +27,36 @@ class _DashboardScreenState extends State<DashboardScreen> {
     _loadStats();
   }
 
+  Widget _buildStaggeredEntry({required Widget child, required int index}) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0, end: 1),
+      duration: Duration(milliseconds: 600 + (index * 150)),
+      curve: Curves.easeOutQuart,
+      builder: (context, value, child) {
+        return Opacity(
+          opacity: value.clamp(0.0, 1.0),
+          child: Transform.translate(
+            offset: Offset(0, 40 * (1 - value)),
+            child: child,
+          ),
+        );
+      },
+      child: child,
+    );
+  }
+
   Future<void> _loadStats() async {
     try {
       final total = await StatsService.instance.getTotalListeningSeconds();
+      final thisMonthTotal = await StatsService.instance.getThisMonthTotalSeconds();
       final goal = await StatsService.instance.getMonthlyGoalHours();
-      final daily = await StatsService.instance.getDailyMinutesThisMonth();
+      final last30Days = await StatsService.instance.getLast30DaysMinutes();
       if (mounted) {
         setState(() {
           _totalSeconds = total;
+          _thisMonthSeconds = thisMonthTotal;
           _goalHours = goal;
-          _dailyMinutes = daily;
+          _last30DaysMinutes = last30Days;
         });
       }
     } catch (e) {
@@ -43,8 +64,95 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 
+  void _editProfile() {
+    final user = FirebaseAuthService.instance.currentUser;
+    if (user == null) return;
+    
+    final nameCtrl = TextEditingController(text: user.displayName);
+    
+    showDialog(
+      context: context,
+      builder: (context) {
+        bool isSaving = false;
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              backgroundColor: AppColors.surfaceContainerHigh,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              title: Text('Edit Profile', style: Theme.of(context).textTheme.titleLarge),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: nameCtrl,
+                    style: TextStyle(color: AppColors.onSurface),
+                    decoration: InputDecoration(
+                      labelText: 'Name',
+                      labelStyle: TextStyle(color: AppColors.outline.withValues(alpha: 0.8)),
+                      filled: true,
+                      fillColor: AppColors.surfaceContainerHighest,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text('Cancel', style: TextStyle(color: AppColors.outline)),
+                ),
+                ElevatedButton(
+                  onPressed: isSaving ? null : () async {
+                    if (nameCtrl.text.trim().isEmpty) return;
+                    setDialogState(() => isSaving = true);
+                    try {
+                      await user.updateDisplayName(nameCtrl.text.trim());
+                      if (mounted) {
+                        setState(() {}); // refresh Dashboard UI
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Profile updated successfully'),
+                            backgroundColor: AppColors.primary.withValues(alpha: 0.9),
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
+                      }
+                    } catch (e) {
+                      setDialogState(() => isSaving = false);
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Error: ${e.toString()}'),
+                            backgroundColor: AppColors.error,
+                          ),
+                        );
+                      }
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  child: isSaving 
+                      ? SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.onPrimaryFixed)) 
+                      : Text('Save', style: TextStyle(color: AppColors.onPrimaryFixed, fontWeight: FontWeight.bold)),
+                ),
+              ],
+            );
+          }
+        );
+      }
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    Theme.of(context); // Force rebuild on theme change
+    
     return Scaffold(
       body: AmbientBackground(
         child: CustomScrollView(
@@ -54,123 +162,147 @@ class _DashboardScreenState extends State<DashboardScreen> {
               elevation: 0,
               pinned: true,
               leading: IconButton(
-                icon: const Icon(Icons.menu, color: AppColors.primary), 
+                icon: Icon(Icons.menu, color: AppColors.primary), 
                 onPressed: () => MainScaffold.of(context)?.openDrawer(),
               ),
-              title: const Text('MELODY', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w900, letterSpacing: 2)),
+              title: Text('MELODY', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w900, letterSpacing: 2)),
               actions: [
-                const CircleAvatar(
+                CircleAvatar(
                   backgroundColor: AppColors.surfaceContainerHighest,
                   backgroundImage: NetworkImage('https://lh3.googleusercontent.com/aida-public/AB6AXuD2RUf0361taIWjap8pCT6E9xx_aPCETtzPol369lfjNcA-cgOMVGcJFkU7R7cNKPR0U28Yfy-xSZI2yWO32Sukd7lBT4q2-kXnQQ0Qo9ZKtbyFuPOhpKEkKPbSZn8iPLxfOiQEOLlLowfTG6-38AUKi0k860xkkLCNP7ULg9aigjg0KsjKB3It2166Ods4-JM4NNVUkbcJzqMNgY8occF9FiK0KTFaVASMo_98dTU_eYqmcMQAL0bK9xLZeSv4Fk5erAybwrjH5e0'),
                 ),
-                const SizedBox(width: 24),
+                SizedBox(width: 24),
               ],
             ),
             SliverPadding(
-              padding: const EdgeInsets.all(24.0),
+              padding: EdgeInsets.all(24.0),
               sliver: SliverList(
                 delegate: SliverChildListDelegate([
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Container(
-                        width: 80,
-                        height: 80,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: AppColors.primary, width: 2),
-                          image: const DecorationImage(
-                            image: NetworkImage('https://lh3.googleusercontent.com/aida-public/AB6AXuD2RUf0361taIWjap8pCT6E9xx_aPCETtzPol369lfjNcA-cgOMVGcJFkU7R7cNKPR0U28Yfy-xSZI2yWO32Sukd7lBT4q2-kXnQQ0Qo9ZKtbyFuPOhpKEkKPbSZn8iPLxfOiQEOLlLowfTG6-38AUKi0k860xkkLCNP7ULg9aigjg0KsjKB3It2166Ods4-JM4NNVUkbcJzqMNgY8occF9FiK0KTFaVASMo_98dTU_eYqmcMQAL0bK9xLZeSv4Fk5erAybwrjH5e0'),
-                            fit: BoxFit.cover,
+                  SizedBox(height: 8),
+                  _buildStaggeredEntry(
+                    index: 0,
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 80,
+                          height: 80,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(color: AppColors.primary, width: 2),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.primary.withValues(alpha: 0.3),
+                                blurRadius: 20,
+                                spreadRadius: -5,
+                              )
+                            ],
+                            image: DecorationImage(
+                              image: NetworkImage('https://lh3.googleusercontent.com/aida-public/AB6AXuD2RUf0361taIWjap8pCT6E9xx_aPCETtzPol369lfjNcA-cgOMVGcJFkU7R7cNKPR0U28Yfy-xSZI2yWO32Sukd7lBT4q2-kXnQQ0Qo9ZKtbyFuPOhpKEkKPbSZn8iPLxfOiQEOLlLowfTG6-38AUKi0k860xkkLCNP7ULg9aigjg0KsjKB3It2166Ods4-JM4NNVUkbcJzqMNgY8occF9FiK0KTFaVASMo_98dTU_eYqmcMQAL0bK9xLZeSv4Fk5erAybwrjH5e0'),
+                              fit: BoxFit.cover,
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 24),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(FirebaseAuthService.instance.currentUser?.displayName ?? 'Melody User', style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold)),
-                            const SizedBox(height: 4),
-                            Text(FirebaseAuthService.instance.currentUser?.email ?? 'user@melody.app', style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: AppColors.primary)),
-                          ],
+                        SizedBox(width: 24),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(FirebaseAuthService.instance.currentUser?.displayName ?? 'Melody User', style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold)),
+                              SizedBox(height: 4),
+                              Text(FirebaseAuthService.instance.currentUser?.email ?? 'user@melody.app', style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: AppColors.primary)),
+                            ],
+                          ),
                         ),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.edit_outlined, color: AppColors.outline),
-                        onPressed: () {},
-                      ),
-                    ],
+                        IconButton(
+                          icon: Icon(Icons.edit_outlined, color: AppColors.outline),
+                          onPressed: _editProfile,
+                        ),
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 48),
+                  SizedBox(height: 48),
 
                   // Stats Grid Let's make it responsive
                   if (MediaQuery.of(context).size.width > 800)
-                    IntrinsicHeight(
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Expanded(flex: 1, child: _buildListeningTimeCard(context)),
-                          const SizedBox(width: 24),
-                          Expanded(flex: 2, child: _buildActivityChartCard(context)),
-                        ],
+                    _buildStaggeredEntry(
+                      index: 1,
+                      child: IntrinsicHeight(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Expanded(flex: 1, child: _buildListeningTimeCard(context)),
+                            SizedBox(width: 24),
+                            Expanded(flex: 2, child: _buildActivityChartCard(context)),
+                          ],
+                        ),
                       ),
                     )
                   else
                     Column(
                       children: [
-                        _buildListeningTimeCard(context),
-                        const SizedBox(height: 24),
-                        _buildActivityChartCard(context),
+                        _buildStaggeredEntry(index: 1, child: _buildListeningTimeCard(context)),
+                        SizedBox(height: 24),
+                        _buildStaggeredEntry(index: 2, child: _buildActivityChartCard(context)),
                       ],
                     ),
                   
-                  const SizedBox(height: 24),
-                  _buildGoalCard(context),
+                  SizedBox(height: 24),
+                  _buildStaggeredEntry(index: 3, child: _buildGoalCard(context)),
 
-                  const SizedBox(height: 48),
+                  SizedBox(height: 48),
                   
                   // Most played tracks
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('Most Played Tracks', style: Theme.of(context).textTheme.headlineMedium),
-                      TextButton(onPressed: () {}, child: const Text('SEE ALL', style: TextStyle(color: AppColors.primary, letterSpacing: 2, fontSize: 12))),
-                    ],
+                  _buildStaggeredEntry(
+                    index: 4,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Most Played Tracks', style: Theme.of(context).textTheme.headlineMedium),
+                        TextButton(
+                          onPressed: () {
+                            MainScaffold.of(context)?.changeTab(0);
+                          }, 
+                          child: Text('SEE ALL', style: TextStyle(color: AppColors.primary, letterSpacing: 2, fontSize: 12))
+                        ),
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24),
                   
-                  Consumer<MusicProvider>(
-                    builder: (context, provider, child) {
-                      if (provider.isLoading) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-                      
-                      final tracks = provider.currentTracks.take(4).toList();
-                      if (tracks.isEmpty) {
-                        return const Text('No tracks available yet.', style: TextStyle(color: AppColors.outlineVariant));
-                      }
-                      
-                      return GridView.count(
-                        crossAxisCount: MediaQuery.of(context).size.width > 800 ? 4 : 2,
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        crossAxisSpacing: 24,
-                        mainAxisSpacing: 24,
-                        childAspectRatio: 0.8,
-                        children: tracks.map((track) {
-                          return _buildTrackCard(
-                            context,
-                            track.name,
-                            track.artistName,
-                            track.image.isNotEmpty ? track.image : 'https://fakeimg.pl/400x400/282828/eae0d0/'
-                          );
-                        }).toList(),
-                      );
-                    },
+                  _buildStaggeredEntry(
+                    index: 5,
+                    child: Consumer<MusicProvider>(
+                      builder: (context, provider, child) {
+                        if (provider.isLoading) {
+                          return Center(child: CircularProgressIndicator());
+                        }
+                        
+                        final tracks = provider.currentTracks.take(4).toList();
+                        if (tracks.isEmpty) {
+                          return Text('No tracks available yet.', style: TextStyle(color: AppColors.outlineVariant));
+                        }
+                        
+                        return GridView.count(
+                          crossAxisCount: MediaQuery.of(context).size.width > 800 ? 4 : 2,
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          crossAxisSpacing: 24,
+                          mainAxisSpacing: 24,
+                          childAspectRatio: 0.8,
+                          children: tracks.map((track) {
+                            return _buildTrackCard(
+                              context,
+                              track.name,
+                              track.artistName,
+                              track.image.isNotEmpty ? track.image : 'https://fakeimg.pl/400x400/282828/eae0d0/'
+                            );
+                          }).toList(),
+                        );
+                      },
+                    ),
                   ),
                   
-                  const SizedBox(height: 120), // Bottom padding for nav bar
+                  SizedBox(height: 120), // Bottom padding for nav bar
                 ]),
               ),
             ),
@@ -182,7 +314,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _buildListeningTimeCard(BuildContext context) {
     return GlassCard(
-      padding: const EdgeInsets.all(32),
+      padding: EdgeInsets.all(32),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -190,16 +322,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text('TOTAL LISTENING TIME', style: Theme.of(context).textTheme.labelSmall?.copyWith(color: AppColors.primary)),
-              const Icon(Icons.schedule, color: AppColors.outlineVariant, size: 48),
+              Icon(Icons.schedule, color: AppColors.outlineVariant, size: 48),
             ],
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           Text(StatsService.formatSeconds(_totalSeconds), style: Theme.of(context).textTheme.displayMedium),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           Row(
             children: [
-              const Icon(Icons.trending_up, color: AppColors.secondary, size: 16),
-              const SizedBox(width: 8),
+              Icon(Icons.trending_up, color: AppColors.secondary, size: 16),
+              SizedBox(width: 8),
               Text('Keep it up!', style: Theme.of(context).textTheme.labelSmall?.copyWith(color: AppColors.secondary)),
             ],
           ),
@@ -211,8 +343,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget _buildActivityChartCard(BuildContext context) {
     // Convert daily stats to normalized heights for the histogram (max 60 mins)
     final last30Days = List.generate(30, (index) {
-      final day = DateTime.now().subtract(Duration(days: 29 - index));
-      return _dailyMinutes[day.day] ?? 0.0;
+      final date = DateTime.now().subtract(Duration(days: 29 - index));
+      final dateKey = DateTime(date.year, date.month, date.day);
+      return _last30DaysMinutes[dateKey] ?? 0.0;
     });
     
     final maxMins = last30Days.reduce((a, b) => a > b ? a : b);
@@ -220,7 +353,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final heights = last30Days.map((m) => (m / normalizationFactor).clamp(0.0, 1.0)).toList();
     
     return GlassCard(
-      padding: const EdgeInsets.all(32),
+      padding: EdgeInsets.all(32),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -231,7 +364,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               Text('LAST 30 DAYS', style: Theme.of(context).textTheme.labelSmall),
             ],
           ),
-          const SizedBox(height: 32),
+          SizedBox(height: 32),
           SizedBox(
             height: 120,
             child: Row(
@@ -239,13 +372,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: List.generate(heights.length, (index) {
                 final isPeak = heights[index] > 0.9;
-                return Container(
-                  width: 4, // thin bars for 30 items
-                  height: (120 * heights[index].toDouble()).clamp(2.0, 120.0),
-                  decoration: BoxDecoration(
-                    color: isPeak ? AppColors.primary : AppColors.surfaceContainerHighest,
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
-                  ),
+                return TweenAnimationBuilder<double>(
+                  tween: Tween<double>(begin: 0.0, end: heights[index].toDouble()),
+                  duration: Duration(milliseconds: 1000 + (index * 30)),
+                  curve: Curves.elasticOut,
+                  builder: (context, value, child) {
+                    return Container(
+                      width: 4, // thin bars for 30 items
+                      height: (120 * value).clamp(2.0, 120.0),
+                      decoration: BoxDecoration(
+                        color: isPeak ? AppColors.primary : AppColors.surfaceContainerHighest,
+                        borderRadius: BorderRadius.vertical(top: Radius.circular(4)),
+                        boxShadow: isPeak ? [
+                          BoxShadow(
+                            color: AppColors.primary.withValues(alpha: 0.5),
+                            blurRadius: 10,
+                            spreadRadius: -2,
+                          )
+                        ] : null,
+                      ),
+                    );
+                  },
                 );
               }),
             ),
@@ -256,11 +403,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _buildGoalCard(BuildContext context) {
-    final progress = _totalSeconds / (_goalHours * 3600);
+    final progress = _thisMonthSeconds / (_goalHours * 3600);
     final percentage = (progress * 100).clamp(0, 100).toInt();
 
     return GlassCard(
-      padding: const EdgeInsets.all(32),
+      padding: EdgeInsets.all(32),
       child: Flex(
         direction: MediaQuery.of(context).size.width > 600 ? Axis.horizontal : Axis.vertical,
         children: [
@@ -270,14 +417,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
+                Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
                     Text('Monthly Goal ', style: Theme.of(context).textTheme.headlineSmall),
                     DropdownButton<int>(
                       value: _goalHours,
                       dropdownColor: AppColors.surfaceContainerHigh,
-                      underline: const SizedBox(),
-                      icon: const Icon(Icons.arrow_drop_down, color: AppColors.primary),
+                      underline: SizedBox(),
+                      icon: Icon(Icons.arrow_drop_down, color: AppColors.primary),
                       items: [10, 20, 30, 50].map((int value) {
                         return DropdownMenuItem<int>(
                           value: value,
@@ -295,7 +443,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 4),
+                SizedBox(height: 4),
                 Text(percentage >= 100 ? "Goal Met!" : "Keep listening!", style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.onSurfaceVariant)),
               ],
             ),
@@ -311,15 +459,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 borderRadius: BorderRadius.circular(8),
               ),
               alignment: Alignment.centerLeft,
-              child: FractionallySizedBox(
-                widthFactor: progress.clamp(0.0, 1.0),
-                alignment: Alignment.centerLeft,
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(colors: [AppColors.primary, AppColors.secondary]),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
+              child: TweenAnimationBuilder<double>(
+                tween: Tween<double>(begin: 0.0, end: progress.clamp(0.0, 1.0)),
+                duration: const Duration(milliseconds: 1500),
+                curve: Curves.easeOutQuart,
+                builder: (context, value, child) {
+                  return FractionallySizedBox(
+                    widthFactor: value,
+                    alignment: Alignment.centerLeft,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(colors: [AppColors.primary, AppColors.secondary]),
+                        borderRadius: BorderRadius.circular(8),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.primary.withValues(alpha: 0.4),
+                            blurRadius: 10,
+                            spreadRadius: -2,
+                          )
+                        ],
+                      ),
+                    ),
+                  );
+                }
               ),
             ),
           ),
@@ -342,9 +504,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
           ),
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: 12),
         Text(title, style: Theme.of(context).textTheme.titleMedium),
-        const SizedBox(height: 4),
+        SizedBox(height: 4),
         Text(subtitle, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.onSurfaceVariant)),
       ],
     );

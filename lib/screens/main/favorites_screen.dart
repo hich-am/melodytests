@@ -27,13 +27,14 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       await FirestoreService.instance.removeFavorite(_uid, trackId);
     } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Authentication failed. Cannot delete track.')),
+        SnackBar(content: Text('Authentication failed. Cannot delete track.')),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    Theme.of(context); // Force rebuild on theme change
     final isWide = MediaQuery.of(context).size.width > 800;
 
     return Scaffold(
@@ -45,22 +46,22 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
               elevation: 0,
               pinned: true,
               leading: IconButton(
-                icon: const Icon(Icons.menu, color: AppColors.primary), 
+                icon: Icon(Icons.menu, color: AppColors.primary), 
                 onPressed: () => MainScaffold.of(context)?.openDrawer(),
               ),
-              title: const Text('MELODY', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w900, letterSpacing: 2)),
+              title: Text('MELODY', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w900, letterSpacing: 2)),
               actions: [
-                if (isWide) const Center(child: Text('Favorites', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold))),
-                const SizedBox(width: 24),
-                const CircleAvatar(
+                if (isWide) Center(child: Text('Favorites', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold))),
+                SizedBox(width: 24),
+                CircleAvatar(
                   backgroundColor: AppColors.surfaceContainerHighest,
                   backgroundImage: NetworkImage('https://lh3.googleusercontent.com/aida-public/AB6AXuBvZfVA1CR3-w7dNtU2wXcxRaOoPdjp1FlWAZO6kQw5UkT5VREof2lB68gshy_RUqdVrqTidz6SZOXa2xFG8t9stpX0wpT140BrSpZIo0oJVdfXjbe9_VKQJRJTP4KCjtFQc6pkRWcZFC3YRGb-zo93b0NHAXmvtrwljLnApABg8VHmYjwwuXarg_Q5ngeUGnzomOUq3RnLYmE4wNDj1TwblDuFsT-1OGeuOqpiC5aNmH0WF2CbSzWHqncaWb3ZRsVIQdV03drYbc4'),
                 ),
-                const SizedBox(width: 24),
+                SizedBox(width: 24),
               ],
             ),
             SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 24.0),
+              padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 24.0),
               sliver: SliverList(
                 delegate: SliverChildListDelegate([
                   
@@ -73,14 +74,14 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('YOUR COLLECTION', style: TextStyle(color: AppColors.secondary, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 2)),
-                          const SizedBox(height: 8),
+                          Text('YOUR COLLECTION', style: TextStyle(color: AppColors.secondary, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 2)),
+                          SizedBox(height: 8),
                           Text('Favorites', style: Theme.of(context).textTheme.displayLarge),
                         ],
                       ),
-                      if (!isWide) const SizedBox(height: 16),
+                      if (!isWide) SizedBox(height: 16),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                         decoration: BoxDecoration(
                           color: AppColors.surfaceContainerLow,
                           borderRadius: BorderRadius.circular(8),
@@ -89,8 +90,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(Icons.fingerprint, color: AppColors.primary),
-                            const SizedBox(width: 12),
+                            Icon(Icons.fingerprint, color: AppColors.primary),
+                            SizedBox(width: 12),
                             Text('Biometric auth required\nfor track removal', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.onSurfaceVariant)),
                           ],
                         ),
@@ -98,14 +99,14 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                     ],
                   ),
                   
-                  const SizedBox(height: 48),
+                  SizedBox(height: 48),
 
                   if (isWide)
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(flex: 2, child: _buildTrackList(context)),
-                        const SizedBox(width: 32),
+                        SizedBox(width: 32),
                         Expanded(flex: 1, child: _buildStatsSidebar(context)),
                       ],
                     )
@@ -113,12 +114,12 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                     Column(
                       children: [
                         _buildTrackList(context),
-                        const SizedBox(height: 48),
+                        SizedBox(height: 48),
                         _buildStatsSidebar(context),
                       ],
                     ),
 
-                  const SizedBox(height: 120), // nav bar padding
+                  SizedBox(height: 120), // nav bar padding
                 ]),
               ),
             ),
@@ -129,33 +130,33 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   }
 
   Widget _buildTrackList(BuildContext context) {
-    if (_uid == null) return const Center(child: Text("Please log in."));
+    if (_uid == null) return Center(child: Text("Please log in."));
     
     return StreamBuilder<List<Track>>(
-      initialData: const <Track>[],
+      initialData: <Track>[],
       stream: FirestoreService.instance.favoritesStream(_uid),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return Center(child: CircularProgressIndicator());
         }
         
         final tracks = snapshot.data ?? [];
         if (tracks.isEmpty) {
-           return const Text("No favorites added yet.");
+           return Text("No favorites added yet.");
         }
 
         return Column(
           children: [
             Row(
               children: [
-                const Expanded(flex: 2, child: Text('TRACK', style: TextStyle(color: AppColors.outline, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 2))),
+                Expanded(flex: 2, child: Text('TRACK', style: TextStyle(color: AppColors.outline, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 2))),
                 if (MediaQuery.of(context).size.width > 600)
-                  const Expanded(flex: 1, child: Text('GENRE', style: TextStyle(color: AppColors.outline, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 2))),
-                const Text('DURATION', style: TextStyle(color: AppColors.outline, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 2)),
-                const SizedBox(width: 48), // Padding for delete icon space
+                  Expanded(flex: 1, child: Text('GENRE', style: TextStyle(color: AppColors.outline, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 2))),
+                Text('DURATION', style: TextStyle(color: AppColors.outline, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 2)),
+                SizedBox(width: 48), // Padding for delete icon space
               ],
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             ...tracks.map((track) => _buildTrackItem(context, track)),
           ],
         );
@@ -167,8 +168,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     return GestureDetector(
       onTap: () => AudioPlayerService.instance.playTrack(track),
       child: Container(
-        margin: const EdgeInsets.only(bottom: 8),
-        padding: const EdgeInsets.all(16),
+        margin: EdgeInsets.only(bottom: 8),
+        padding: EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: AppColors.surfaceContainerLow,
           borderRadius: BorderRadius.circular(8),
@@ -188,7 +189,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                       image: track.image.isNotEmpty ? DecorationImage(image: NetworkImage(track.image), fit: BoxFit.cover) : null,
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  SizedBox(width: 16),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -210,9 +211,9 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text('--:--', style: Theme.of(context).textTheme.labelSmall),
-                const SizedBox(width: 24),
+                SizedBox(width: 24),
                 IconButton(
-                  icon: const Icon(Icons.delete_outline, color: AppColors.outline),
+                  icon: Icon(Icons.delete_outline, color: AppColors.outline),
                   onPressed: () => _deleteWithBiometric(track.id),
                   hoverColor: AppColors.error.withValues(alpha: 0.1),
                 ),
@@ -226,14 +227,14 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
 
   Widget _buildStatsSidebar(BuildContext context) {
     return GlassCard(
-      padding: const EdgeInsets.all(32),
+      padding: EdgeInsets.all(32),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('Playlist Stats', style: Theme.of(context).textTheme.headlineMedium),
-          const SizedBox(height: 4),
+          SizedBox(height: 4),
           Text('Curated over 6 months', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.onSurfaceVariant)),
-          const SizedBox(height: 32),
+          SizedBox(height: 32),
           
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -242,7 +243,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
               Text('128', style: Theme.of(context).textTheme.titleLarge?.copyWith(color: AppColors.primary)),
             ],
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: 24),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -251,21 +252,21 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
             ],
           ),
           
-          const SizedBox(height: 32),
-          const Divider(color: AppColors.outlineVariant),
-          const SizedBox(height: 32),
+          SizedBox(height: 32),
+          Divider(color: AppColors.outlineVariant),
+          SizedBox(height: 32),
           
           Container(
             width: double.infinity,
             height: 56,
             decoration: BoxDecoration(
-              gradient: const LinearGradient(colors: [AppColors.primary, AppColors.primaryContainer]),
+              gradient: LinearGradient(colors: [AppColors.primary, AppColors.primaryContainer]),
               borderRadius: BorderRadius.circular(16),
             ),
             child: ElevatedButton.icon(
               onPressed: () {},
-              icon: const Icon(Icons.shuffle, color: AppColors.onPrimaryFixed),
-              label: const Text('Shuffle Collection', style: TextStyle(color: AppColors.onPrimaryFixed, fontWeight: FontWeight.bold)),
+              icon: Icon(Icons.shuffle, color: AppColors.onPrimaryFixed),
+              label: Text('Shuffle Collection', style: TextStyle(color: AppColors.onPrimaryFixed, fontWeight: FontWeight.bold)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.transparent,
                 shadowColor: Colors.transparent,
@@ -274,22 +275,22 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
             ),
           ),
           
-          const SizedBox(height: 48),
+          SizedBox(height: 48),
           Text('SECURITY NOTICE', style: TextStyle(color: AppColors.secondary, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 2)),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(16),
             decoration: BoxDecoration(color: AppColors.surfaceContainerLowest, borderRadius: BorderRadius.circular(8)),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(Icons.verified_user, color: AppColors.tertiary),
-                const SizedBox(width: 12),
+                Icon(Icons.verified_user, color: AppColors.tertiary),
+                SizedBox(width: 12),
                 Expanded(
                   child: RichText(
                     text: TextSpan(
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.onSurfaceVariant),
-                      children: const [
+                      children: [
                         TextSpan(text: 'To protect your curated collection, deleting any track requires active '),
                         TextSpan(text: 'Fingerprint Authentication', style: TextStyle(color: AppColors.onSurface, fontWeight: FontWeight.bold)),
                         TextSpan(text: '. Ensure your device sensor is clean.'),

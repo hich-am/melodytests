@@ -38,7 +38,7 @@ class ForgotPasswordScreen extends StatelessWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text('MELODY', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w900, fontSize: 24, letterSpacing: 2)),
+                        Text('MELODY', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w900, fontSize: 24, letterSpacing: 2)),
                         const SizedBox(height: 48),
                         
                         GlassCard(
@@ -58,7 +58,7 @@ class ForgotPasswordScreen extends StatelessWidget {
                                     ),
                                   ],
                                 ),
-                                child: const Icon(Icons.lock_reset, size: 64, color: AppColors.primary),
+                                child: Icon(Icons.lock_reset, size: 64, color: AppColors.primary),
                               ),
                               const SizedBox(height: 32),
                               Text('Lost your rhythm?', style: Theme.of(context).textTheme.headlineMedium, textAlign: TextAlign.center),
@@ -71,11 +71,11 @@ class ForgotPasswordScreen extends StatelessWidget {
                               const SizedBox(height: 40),
                               
                               TextField(
-                                style: const TextStyle(color: AppColors.onSurface),
+                                style: TextStyle(color: AppColors.onSurface),
                                 decoration: InputDecoration(
                                   hintText: 'Email address',
                                   hintStyle: TextStyle(color: AppColors.outline.withValues(alpha: 0.5)),
-                                  prefixIcon: const Icon(Icons.mail_outline, color: AppColors.outline),
+                                  prefixIcon: Icon(Icons.mail_outline, color: AppColors.outline),
                                   filled: true,
                                   fillColor: AppColors.surfaceContainerHigh,
                                   contentPadding: const EdgeInsets.symmetric(vertical: 20),
@@ -89,7 +89,7 @@ class ForgotPasswordScreen extends StatelessWidget {
                                 width: double.infinity,
                                 height: 56,
                                 decoration: BoxDecoration(
-                                  gradient: const LinearGradient(colors: [AppColors.primary, AppColors.primaryContainer]),
+                                  gradient: LinearGradient(colors: [AppColors.primary, AppColors.primaryContainer]),
                                   borderRadius: BorderRadius.circular(16),
                                 ),
                                 child: ElevatedButton(
@@ -99,7 +99,7 @@ class ForgotPasswordScreen extends StatelessWidget {
                                     shadowColor: Colors.transparent,
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                                   ),
-                                  child: const Text('Send Reset Link', style: TextStyle(color: AppColors.onPrimaryFixed, fontWeight: FontWeight.bold, fontSize: 16)),
+                                  child: Text('Send Reset Link', style: TextStyle(color: AppColors.onPrimaryFixed, fontWeight: FontWeight.bold, fontSize: 16)),
                                 ),
                               ),
                               
@@ -108,8 +108,8 @@ class ForgotPasswordScreen extends StatelessWidget {
                                 onPressed: () {
                                   Navigator.pop(context);
                                 },
-                                icon: const Icon(Icons.arrow_back, color: AppColors.onSurfaceVariant),
-                                label: const Text('Back to login', style: TextStyle(color: AppColors.onSurfaceVariant)),
+                                icon: Icon(Icons.arrow_back, color: AppColors.onSurfaceVariant),
+                                label: Text('Back to login', style: TextStyle(color: AppColors.onSurfaceVariant)),
                               ),
                             ],
                           ),

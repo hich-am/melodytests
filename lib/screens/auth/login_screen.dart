@@ -69,11 +69,11 @@ class _LoginScreenState extends State<LoginScreen> {
         child: SingleChildScrollView(
           child: Padding(
             padding:
-                const EdgeInsets.symmetric(horizontal: 24.0, vertical: 48.0),
+                EdgeInsets.symmetric(horizontal: 24.0, vertical: 48.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const SizedBox(height: 60),
+                SizedBox(height: 60),
 
                 // Melody Brand Logo
                 Container(
@@ -94,19 +94,19 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
 
-                const SizedBox(height: 32),
+                SizedBox(height: 32),
                 Text('Welcome Back',
                     style: Theme.of(context).textTheme.displaySmall),
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 Text('Enter the sanctuary of sound.',
                     style: Theme.of(context)
                         .textTheme
                         .bodyLarge
                         ?.copyWith(color: AppColors.onSurfaceVariant)),
-                const SizedBox(height: 48),
+                SizedBox(height: 48),
 
                 GlassCard(
-                  padding: const EdgeInsets.all(32),
+                  padding: EdgeInsets.all(32),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -119,21 +119,21 @@ class _LoginScreenState extends State<LoginScreen> {
                                   color: AppColors.onSurfaceVariant,
                                   fontSize: 12,
                                   letterSpacing: 0.5)),
-                      const SizedBox(height: 8),
+                      SizedBox(height: 8),
                       TextField(
                         controller: _emailCtrl,
                         keyboardType: TextInputType.emailAddress,
-                        style: const TextStyle(color: AppColors.onSurface),
+                        style: TextStyle(color: AppColors.onSurface),
                         decoration: InputDecoration(
                           hintText: 'name@example.com',
                           hintStyle: TextStyle(
                               color: AppColors.outline.withValues(alpha: 0.5)),
-                          prefixIcon: const Icon(Icons.mail_outline,
+                          prefixIcon: Icon(Icons.mail_outline,
                               color: AppColors.outline),
                           filled: true,
                           fillColor: AppColors.surfaceContainerHigh,
                           contentPadding:
-                              const EdgeInsets.symmetric(vertical: 20),
+                              EdgeInsets.symmetric(vertical: 20),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(30),
                             borderSide: BorderSide.none,
@@ -146,7 +146,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
 
-                      const SizedBox(height: 24),
+                      SizedBox(height: 24),
 
                       // Password row
                       Row(
@@ -175,16 +175,16 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 8),
+                      SizedBox(height: 8),
                       TextField(
                         controller: _passwordCtrl,
                         obscureText: _obscurePassword,
-                        style: const TextStyle(color: AppColors.onSurface),
+                        style: TextStyle(color: AppColors.onSurface),
                         decoration: InputDecoration(
                           hintText: '••••••••',
                           hintStyle: TextStyle(
                               color: AppColors.outline.withValues(alpha: 0.5)),
-                          prefixIcon: const Icon(Icons.lock_outline,
+                          prefixIcon: Icon(Icons.lock_outline,
                               color: AppColors.outline),
                           suffixIcon: IconButton(
                             icon: Icon(
@@ -199,7 +199,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           filled: true,
                           fillColor: AppColors.surfaceContainerHigh,
                           contentPadding:
-                              const EdgeInsets.symmetric(vertical: 20),
+                              EdgeInsets.symmetric(vertical: 20),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(30),
                             borderSide: BorderSide.none,
@@ -212,7 +212,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
 
-                      const SizedBox(height: 32),
+                      SizedBox(height: 32),
 
                       // Sign In Button
                       SizedBox(
@@ -220,7 +220,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         height: 60,
                         child: Container(
                           decoration: BoxDecoration(
-                            gradient: const LinearGradient(
+                            gradient: LinearGradient(
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                               colors: [
@@ -233,7 +233,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               BoxShadow(
                                   color: AppColors.primary.withValues(alpha: 0.2),
                                   blurRadius: 30,
-                                  offset: const Offset(0, 10)),
+                                  offset: Offset(0, 10)),
                             ],
                           ),
                           child: ElevatedButton(
@@ -245,11 +245,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                   borderRadius: BorderRadius.circular(16)),
                             ),
                             child: _isLoading
-                                ? const CircularProgressIndicator(
+                                ? CircularProgressIndicator(
                                     color: AppColors.onPrimaryFixed,
                                     strokeWidth: 2,
                                   )
-                                : const Text('Sign In',
+                                : Text('Sign In',
                                     style: TextStyle(
                                         color: AppColors.onPrimaryFixed,
                                         fontSize: 18,
@@ -258,7 +258,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
 
-                      const SizedBox(height: 32),
+                      SizedBox(height: 32),
                       Center(
                         child: GestureDetector(
                           onTap: () =>
@@ -271,7 +271,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   .bodyMedium
                                   ?.copyWith(
                                       color: AppColors.onSurfaceVariant),
-                              children: const [
+                              children: [
                                 TextSpan(
                                   text: 'Create an account',
                                   style: TextStyle(
@@ -287,7 +287,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
 
-                const SizedBox(height: 32),
+                SizedBox(height: 32),
                 Row(
                   children: [
                     Expanded(
@@ -295,7 +295,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             height: 1,
                             color:
                                 AppColors.outlineVariant.withValues(alpha: 0.3))),
-                    const Padding(
+                    Padding(
                       padding: EdgeInsets.symmetric(horizontal: 16),
                       child: Text('OR CONTINUE WITH',
                           style: TextStyle(
@@ -311,28 +311,28 @@ class _LoginScreenState extends State<LoginScreen> {
                   ],
                 ),
 
-                const SizedBox(height: 32),
+                SizedBox(height: 32),
                 Row(
                   children: [
                     Expanded(
                         child: GlassCard(
                             padding:
-                                const EdgeInsets.symmetric(vertical: 16),
-                            child: const Center(
+                                EdgeInsets.symmetric(vertical: 16),
+                            child: Center(
                                 child: Icon(Icons.g_mobiledata, size: 28)))),
-                    const SizedBox(width: 16),
+                    SizedBox(width: 16),
                     Expanded(
                         child: GlassCard(
                             padding:
-                                const EdgeInsets.symmetric(vertical: 16),
-                            child: const Center(
+                                EdgeInsets.symmetric(vertical: 16),
+                            child: Center(
                                 child: Icon(Icons.apple, size: 28)))),
-                    const SizedBox(width: 16),
+                    SizedBox(width: 16),
                     Expanded(
                         child: GlassCard(
                             padding:
-                                const EdgeInsets.symmetric(vertical: 16),
-                            child: const Center(
+                                EdgeInsets.symmetric(vertical: 16),
+                            child: Center(
                                 child: Icon(Icons.facebook, size: 28)))),
                   ],
                 ),

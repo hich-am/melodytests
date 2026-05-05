@@ -35,6 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Theme.of(context); // Force rebuild on theme change
     final isWide = MediaQuery.of(context).size.width > 800;
 
     return Scaffold(
@@ -48,40 +49,40 @@ class _HomeScreenState extends State<HomeScreen> {
                   elevation: 0,
                   pinned: true,
                   leading: IconButton(
-                    icon: const Icon(Icons.menu, color: AppColors.primary), 
+                    icon: Icon(Icons.menu, color: AppColors.primary), 
                     onPressed: () => MainScaffold.of(context)?.openDrawer(),
                   ),
-                  title: const Text('MELODY', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w900, letterSpacing: 2)),
+                  title: Text('MELODY', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w900, letterSpacing: 2)),
                   actions: [
                     if (isWide) ...[
-                      TextButton(onPressed: () {}, child: const Text('Home', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold))),
-                      TextButton(onPressed: () {}, child: const Text('Explore', style: TextStyle(color: AppColors.outline))),
-                      TextButton(onPressed: () {}, child: const Text('Library', style: TextStyle(color: AppColors.outline))),
+                      TextButton(onPressed: () {}, child: Text('Home', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold))),
+                      TextButton(onPressed: () {}, child: Text('Explore', style: TextStyle(color: AppColors.outline))),
+                      TextButton(onPressed: () {}, child: Text('Library', style: TextStyle(color: AppColors.outline))),
                     ],
-                    const SizedBox(width: 16),
+                    SizedBox(width: 16),
                     GestureDetector(
                       onTap: () => MainScaffold.of(context)?.changeTab(3),
-                      child: const CircleAvatar(
+                      child: CircleAvatar(
                         backgroundColor: AppColors.surfaceContainerHighest,
                         backgroundImage: NetworkImage('https://lh3.googleusercontent.com/aida-public/AB6AXuCuYNhxW94PVo9l_5D4XY_bP_xSRP5vyN8_TgJnDarc7UnyLdbpSKQJ16ZwPqk46tduJLBO0Fg6tB5aVmK5KIgW96eX58yDvd-KJTrVwEgqF7WGTkHMFlDmTCO6MWvsIWx1b4VuH1WFbl-BHqA8pEU6UM581hx8VKa1SEhpfUpUmR5dcUgzmNSLv5NLO87SQm50-VufjzybxuvEBcJp8Vnw5oR3escltrJofLmeVH_fjEV9eeFLUuef8UnDJNbapk9UazqjPG38yjU'),
                       ),
                     ),
-                    const SizedBox(width: 24),
+                    SizedBox(width: 24),
                   ],
                 ),
                 SliverPadding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 24.0),
+                  padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 24.0),
                   sliver: SliverList(
                     delegate: SliverChildListDelegate([
                       
                       // Genre Chips
                       SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
-                        physics: const BouncingScrollPhysics(),
+                        physics: BouncingScrollPhysics(),
                         child: Row(
                           children: _genres.map((genre) {
                             return Padding(
-                              padding: const EdgeInsets.only(right: 16),
+                              padding: EdgeInsets.only(right: 16),
                               child: GestureDetector(
                                 onTap: () {
                                   setState(() => _selectedGenre = genre);
@@ -94,7 +95,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       
-                      const SizedBox(height: 48),
+                      SizedBox(height: 48),
 
                       // Hero Playlist Section
                       if (isWide)
@@ -102,7 +103,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Expanded(flex: 7, child: _buildHeroPlaylist(context)),
-                            const SizedBox(width: 32),
+                            SizedBox(width: 32),
                             Expanded(flex: 5, child: _buildMixesGrid(context)),
                           ],
                         )
@@ -110,12 +111,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         Column(
                           children: [
                             _buildHeroPlaylist(context),
-                            const SizedBox(height: 24),
+                            SizedBox(height: 24),
                             SizedBox(height: 300, child: _buildMixesGrid(context)), // Fixed height for grid in mobile view
                           ],
                         ),
 
-                      const SizedBox(height: 48),
+                      SizedBox(height: 48),
 
                       // Track List
                       Row(
@@ -125,23 +126,55 @@ class _HomeScreenState extends State<HomeScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text('Recent Tracks', style: Theme.of(context).textTheme.headlineMedium),
-                              const SizedBox(height: 4),
+                              SizedBox(height: 4),
                               Text('Your sonic journey continues here.', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.onSurfaceVariant)),
                             ],
                           ),
                           TextButton(
-                            onPressed: () {},
-                            child: const Text('View All', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
+                            onPressed: () {
+                              final provider = context.read<MusicProvider>();
+                              if (provider.currentTracks.isEmpty) return;
+                              showModalBottomSheet(
+                                context: context,
+                                backgroundColor: AppColors.surface,
+                                isScrollControlled: true,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+                                builder: (context) => DraggableScrollableSheet(
+                                  expand: false,
+                                  initialChildSize: 0.7,
+                                  maxChildSize: 0.9,
+                                  minChildSize: 0.5,
+                                  builder: (_, scrollController) => Column(
+                                    children: [
+                                      SizedBox(height: 16),
+                                      Container(width: 40, height: 4, decoration: BoxDecoration(color: AppColors.outlineVariant, borderRadius: BorderRadius.circular(2))),
+                                      SizedBox(height: 16),
+                                      Text('All Tracks', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
+                                      SizedBox(height: 16),
+                                      Expanded(
+                                        child: ListView.builder(
+                                          controller: scrollController,
+                                          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                                          itemCount: provider.currentTracks.length,
+                                          itemBuilder: (context, index) => _buildRecentTrack(context, provider.currentTracks[index]),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Text('View All', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 24),
+                      SizedBox(height: 24),
                       Consumer<MusicProvider>(
                         builder: (context, provider, child) {
                           if (provider.isLoading) {
-                            return const Center(child: CircularProgressIndicator());
+                            return Center(child: CircularProgressIndicator());
                           } else if (provider.currentTracks.isEmpty) {
-                            return const Center(child: Text("No tracks found."));
+                            return Center(child: Text("No tracks found."));
                           } else {
                             // Show tracks from index 1 to 5 as recent tracks (or any criteria)
                             final tracks = provider.currentTracks.skip(1).take(5).toList();
@@ -152,7 +185,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         },
                       ),
 
-                      const SizedBox(height: 200), // Spacing for player and navbar
+                      SizedBox(height: 200), // Spacing for player and navbar
                     ]),
                   ),
                 ),
@@ -168,7 +201,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 stream: AudioPlayerService.instance.playerStateStream,
                 builder: (context, snapshot) {
                   final track = AudioPlayerService.instance.currentTrack;
-                  if (track == null) return const SizedBox.shrink();
+                  if (track == null) return SizedBox.shrink();
                   
                   final playing = snapshot.data?.playing ?? false;
                   
@@ -176,7 +209,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const PlayerScreen()),
+                        MaterialPageRoute(builder: (context) => PlayerScreen()),
                       );
                     },
                     child: ClipRRect(
@@ -184,7 +217,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: BackdropFilter(
                       filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
                       child: Container(
-                        padding: const EdgeInsets.all(16),
+                        padding: EdgeInsets.all(16),
                         decoration: BoxDecoration(
                           color: AppColors.surfaceVariant.withValues(alpha: 0.6),
                           border: Border(top: BorderSide(color: Colors.white.withValues(alpha: 0.1), width: 1)),
@@ -215,7 +248,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         widthFactor: fraction.clamp(0.0, 1.0),
                                         child: Container(
                                           decoration: BoxDecoration(
-                                            gradient: const LinearGradient(colors: [AppColors.primary, AppColors.secondary]),
+                                            gradient: LinearGradient(colors: [AppColors.primary, AppColors.secondary]),
                                             borderRadius: BorderRadius.circular(2),
                                           ),
                                         ),
@@ -225,7 +258,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 );
                               }
                             ),
-                            const SizedBox(height: 16),
+                            SizedBox(height: 16),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -243,14 +276,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                           ),
                                         ),
                                       ),
-                                      const SizedBox(width: 16),
+                                      SizedBox(width: 16),
                                       Expanded(
                                         child: Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
-                                            Text(track.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14), overflow: TextOverflow.ellipsis),
-                                            const SizedBox(height: 4),
-                                            Text(track.artistName, style: TextStyle(color: Colors.grey[400], fontSize: 12), overflow: TextOverflow.ellipsis),
+                                            Text(track.name, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppColors.onSurface), overflow: TextOverflow.ellipsis),
+                                            SizedBox(height: 4),
+                                            Text(track.artistName, style: TextStyle(color: AppColors.onSurfaceVariant, fontSize: 12), overflow: TextOverflow.ellipsis),
                                           ],
                                         ),
                                       ),
@@ -267,34 +300,34 @@ class _HomeScreenState extends State<HomeScreen> {
                                         setState(() {});
                                       }
                                     ),
-                                    const SizedBox(width: 16),
+                                    SizedBox(width: 16),
                                     IconButton(
-                                      icon: const Icon(Icons.skip_previous, color: AppColors.onSurface),
+                                      icon: Icon(Icons.skip_previous, color: AppColors.onSurface),
                                       onPressed: () => AudioPlayerService.instance.playPrevious()
                                     ),
-                                    Container(
-                                      width: 48,
-                                      height: 48,
-                                      decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                                      child: IconButton(
-                                        icon: Icon(playing ? Icons.pause : Icons.play_arrow, color: AppColors.background, size: 28),
-                                        onPressed: () => AudioPlayerService.instance.togglePlayPause(),
+                                      Container(
+                                        width: 48,
+                                        height: 48,
+                                        decoration: BoxDecoration(color: AppColors.primary, shape: BoxShape.circle),
+                                        child: IconButton(
+                                          icon: Icon(playing ? Icons.pause : Icons.play_arrow, color: AppColors.onPrimaryFixed, size: 28),
+                                          onPressed: () => AudioPlayerService.instance.togglePlayPause(),
                                       ),
                                     ),
                                     IconButton(
-                                      icon: const Icon(Icons.skip_next, color: AppColors.onSurface),
+                                      icon: Icon(Icons.skip_next, color: AppColors.onSurface),
                                       onPressed: () => AudioPlayerService.instance.playNext()
                                     ),
-                                    if (isWide) IconButton(icon: const Icon(Icons.repeat, color: AppColors.outline), onPressed: () => AudioPlayerService.instance.toggleRepeat()),
+                                    if (isWide) IconButton(icon: Icon(Icons.repeat, color: AppColors.outline), onPressed: () => AudioPlayerService.instance.toggleRepeat()),
                                   ],
                                 ),
                                 
                                 if (isWide)
                                   Row(
                                     children: [
-                                      const SizedBox(width: 16),
-                                      const Icon(Icons.volume_up, color: AppColors.outline, size: 16),
-                                      const SizedBox(width: 8),
+                                      SizedBox(width: 16),
+                                      Icon(Icons.volume_up, color: AppColors.outline, size: 16),
+                                      SizedBox(width: 8),
                                       Container(
                                         width: 100,
                                         height: 4,
@@ -305,8 +338,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                           child: Container(decoration: BoxDecoration(color: AppColors.primary, borderRadius: BorderRadius.circular(2))),
                                         ),
                                       ),
-                                      const SizedBox(width: 16),
-                                      const Icon(Icons.playlist_play, color: AppColors.outline),
+                                      SizedBox(width: 16),
+                                      Icon(Icons.playlist_play, color: AppColors.outline),
                                     ],
                                   ),
                               ],
@@ -328,10 +361,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildGenreChip(String label, bool isSelected) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+      padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
       decoration: BoxDecoration(
         color: isSelected ? null : AppColors.surfaceContainerHigh,
-        gradient: isSelected ? const LinearGradient(colors: [AppColors.primary, AppColors.primaryContainer], begin: Alignment.topLeft, end: Alignment.bottomRight) : null,
+        gradient: isSelected ? LinearGradient(colors: [AppColors.primary, AppColors.primaryContainer], begin: Alignment.topLeft, end: Alignment.bottomRight) : null,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
@@ -373,16 +406,16 @@ class _HomeScreenState extends State<HomeScreen> {
             colors: [Colors.black.withValues(alpha: 0.8), Colors.transparent],
           ),
         ),
-        padding: const EdgeInsets.all(32),
+        padding: EdgeInsets.all(32),
         alignment: Alignment.bottomLeft,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('FEATURED PLAYLIST', style: TextStyle(color: AppColors.tertiary, fontWeight: FontWeight.bold, fontSize: 10, letterSpacing: 2)),
-            const SizedBox(height: 8),
+            Text('FEATURED PLAYLIST', style: TextStyle(color: AppColors.tertiary, fontWeight: FontWeight.bold, fontSize: 10, letterSpacing: 2)),
+            SizedBox(height: 8),
             Text(featured?.name ?? 'Loading...', style: Theme.of(context).textTheme.displayMedium?.copyWith(color: Colors.white, height: 1.1)),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             ElevatedButton.icon(
               onPressed: () {
                 if (featured != null) {
@@ -390,11 +423,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   AudioPlayerService.instance.playTrack(featured, playlist: playlist);
                 }
               },
-              icon: const Icon(Icons.play_arrow, color: Colors.black),
-              label: const Text('Play Now', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+              icon: Icon(Icons.play_arrow, color: Colors.black),
+              label: Text('Play Now', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
               ),
             ),
@@ -410,48 +443,68 @@ class _HomeScreenState extends State<HomeScreen> {
       crossAxisSpacing: 16,
       mainAxisSpacing: 16,
       childAspectRatio: 1.2,
-      physics: const NeverScrollableScrollPhysics(),
+      physics: NeverScrollableScrollPhysics(),
       shrinkWrap: true,
       children: [
-        _buildMixCard('Daily Mix', 'Curated for you', '01'),
-        _buildMixCard('Mood Boost', 'Vibrant beats', '02'),
-        _buildMixCard('Chill Out', 'Deep focus', '03'),
-        _buildMixCard('Jazz Flow', 'Classic soul', '04'),
+        _buildMixCard(context, 'Daily Mix', 'Curated for you', '01', _selectedGenre == 'Pop', () {
+          setState(() => _selectedGenre = 'Pop');
+          context.read<MusicProvider>().loadGenreTracks('pop');
+        }),
+        _buildMixCard(context, 'Mood Boost', 'Vibrant beats', '02', _selectedGenre == 'Electronic', () {
+          setState(() => _selectedGenre = 'Electronic');
+          context.read<MusicProvider>().loadGenreTracks('electronic');
+        }),
+        _buildMixCard(context, 'Chill Out', 'Deep focus', '03', _selectedGenre == 'Classical', () {
+          setState(() => _selectedGenre = 'Classical');
+          context.read<MusicProvider>().loadGenreTracks('classical');
+        }),
+        _buildMixCard(context, 'Jazz Flow', 'Classic soul', '04', _selectedGenre == 'Jazz', () {
+          setState(() => _selectedGenre = 'Jazz');
+          context.read<MusicProvider>().loadGenreTracks('jazz');
+        }),
       ],
     );
   }
 
-  Widget _buildMixCard(String title, String subtitle, String number) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      padding: const EdgeInsets.all(24),
-      child: Stack(
-        children: [
-          Positioned(
-            top: -20,
-            right: -10,
-            child: Text(
-              number,
-              style: TextStyle(
-                fontSize: 80,
-                fontWeight: FontWeight.w900,
-                color: Colors.white.withValues(alpha: 0.05),
+  Widget _buildMixCard(BuildContext context, String title, String subtitle, String number, bool isSelected, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: Duration(milliseconds: 300),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.primaryContainer.withValues(alpha: 0.15) : AppColors.surfaceContainerLow,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isSelected ? AppColors.primary.withValues(alpha: 0.5) : Colors.transparent,
+            width: 2,
+          ),
+        ),
+        padding: EdgeInsets.all(24),
+        child: Stack(
+          children: [
+            Positioned(
+              top: -20,
+              right: -10,
+              child: Text(
+                number,
+                style: TextStyle(
+                  fontSize: 80,
+                  fontWeight: FontWeight.w900,
+                  color: isSelected ? AppColors.primary.withValues(alpha: 0.1) : AppColors.onSurface.withValues(alpha: 0.05),
+                ),
               ),
             ),
-          ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-              const SizedBox(height: 4),
-              Text(subtitle, style: const TextStyle(color: AppColors.outline, fontSize: 12)),
-            ],
-          ),
-        ],
+            Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: isSelected ? AppColors.primary : AppColors.onSurface)),
+                SizedBox(height: 4),
+                Text(subtitle, style: TextStyle(color: isSelected ? AppColors.primary.withValues(alpha: 0.8) : AppColors.outline, fontSize: 12)),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -463,8 +516,8 @@ class _HomeScreenState extends State<HomeScreen> {
         AudioPlayerService.instance.playTrack(track, playlist: playlist);
       },
       child: Container(
-        margin: const EdgeInsets.only(bottom: 8),
-        padding: const EdgeInsets.all(16),
+        margin: EdgeInsets.only(bottom: 8),
+        padding: EdgeInsets.all(16),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           color: Colors.transparent, // add hover effect if needed
@@ -480,30 +533,30 @@ class _HomeScreenState extends State<HomeScreen> {
                 image: track.image.isNotEmpty ? DecorationImage(image: NetworkImage(track.image), fit: BoxFit.cover) : null,
               ),
             ),
-            const SizedBox(width: 16),
+            SizedBox(width: 16),
             Expanded(
               flex: 3,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(track.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16), overflow: TextOverflow.ellipsis),
-                  const SizedBox(height: 4),
-                  Text(track.artistName, style: const TextStyle(color: AppColors.outline, fontSize: 12), overflow: TextOverflow.ellipsis),
+                  Text(track.name, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16), overflow: TextOverflow.ellipsis),
+                  SizedBox(height: 4),
+                  Text(track.artistName, style: TextStyle(color: AppColors.outline, fontSize: 12), overflow: TextOverflow.ellipsis),
                 ],
               ),
             ),
             if (MediaQuery.of(context).size.width > 600)
               Expanded(
                 flex: 2,
-                child: Text(track.albumName, style: const TextStyle(color: AppColors.outline, fontSize: 12), overflow: TextOverflow.ellipsis),
+                child: Text(track.albumName, style: TextStyle(color: AppColors.outline, fontSize: 12), overflow: TextOverflow.ellipsis),
               ),
             Row(
               children: [
                 StreamBuilder<List<Track>>(
-                  initialData: const <Track>[],
+                  initialData: <Track>[],
                   stream: FirebaseAuthService.instance.currentUser != null
                       ? FirestoreService.instance.favoritesStream(FirebaseAuthService.instance.currentUser!.uid)
-                      : Stream.value(const <Track>[]),
+                      : Stream.value(<Track>[]),
                   builder: (context, snapshot) {
                     final isFav = snapshot.data?.any((t) => t.id == track.id) ?? false;
                     return IconButton(
@@ -522,10 +575,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     );
                   },
                 ),
-                const SizedBox(width: 8),
-                const Text('--:--', style: TextStyle(color: AppColors.outline, fontSize: 12)),
-                const SizedBox(width: 24),
-                const Icon(Icons.more_vert, color: AppColors.outline),
+                SizedBox(width: 8),
+                Text('--:--', style: TextStyle(color: AppColors.outline, fontSize: 12)),
+                SizedBox(width: 24),
+                Icon(Icons.more_vert, color: AppColors.outline),
               ],
             ),
           ],

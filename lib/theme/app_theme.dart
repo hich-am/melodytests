@@ -2,51 +2,51 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppColors {
+  static bool isDarkMode = true;
+
   // Brand
-  static const primary = Color(0xFFD6BAFF);
-  static const primaryContainer = Color(0xFFAB73FF);
-  static const onPrimaryFixed = Color(0xFF280056);
+  static Color get primary => isDarkMode ? const Color(0xFFD6BAFF) : const Color(0xFF7E3FF2);
+  static Color get primaryContainer => isDarkMode ? const Color(0xFFAB73FF) : const Color(0xFF5A20C1);
+  static Color get onPrimaryFixed => isDarkMode ? const Color(0xFF280056) : const Color(0xFFFFFFFF);
   
-  static const secondary = Color(0xFF9BE1FF);
-  static const tertiary = Color(0xFF43D9E9);
+  static Color get secondary => isDarkMode ? const Color(0xFF9BE1FF) : const Color(0xFF0086C9);
+  static Color get tertiary => isDarkMode ? const Color(0xFF43D9E9) : const Color(0xFF009CA6);
   
   // Background & Surface
-  static const background = Color(0xFF131315);
-  static const onBackground = Color(0xFFE5E1E4);
+  static Color get background => isDarkMode ? const Color(0xFF131315) : const Color(0xFFF4F5F8);
+  static Color get onBackground => isDarkMode ? const Color(0xFFE5E1E4) : const Color(0xFF1C1B1F);
   
-  static const surface = Color(0xFF131315);
-  static const onSurface = Color(0xFFE5E1E4);
-  static const surfaceVariant = Color(0xFF353437);
-  static const onSurfaceVariant = Color(0xFFCDC2D7);
+  static Color get surface => isDarkMode ? const Color(0xFF131315) : const Color(0xFFF4F5F8);
+  static Color get onSurface => isDarkMode ? const Color(0xFFE5E1E4) : const Color(0xFF1C1B1F);
+  static Color get surfaceVariant => isDarkMode ? const Color(0xFF353437) : const Color(0xFFE8E9EC);
+  static Color get onSurfaceVariant => isDarkMode ? const Color(0xFFCDC2D7) : const Color(0xFF49454F);
   
-  static const surfaceContainerLowest = Color(0xFF0E0E10);
-  static const surfaceContainerLow = Color(0xFF1B1B1D);
-  static const surfaceContainer = Color(0xFF201F21);
-  static const surfaceContainerHigh = Color(0xFF2A2A2C);
-  static const surfaceContainerHighest = Color(0xFF353437);
+  static Color get surfaceContainerLowest => isDarkMode ? const Color(0xFF0E0E10) : const Color(0xFFFFFFFF);
+  static Color get surfaceContainerLow => isDarkMode ? const Color(0xFF1B1B1D) : const Color(0xFFF8F9FA);
+  static Color get surfaceContainer => isDarkMode ? const Color(0xFF201F21) : const Color(0xFFF0F1F3);
+  static Color get surfaceContainerHigh => isDarkMode ? const Color(0xFF2A2A2C) : const Color(0xFFE8E9EC);
+  static Color get surfaceContainerHighest => isDarkMode ? const Color(0xFF353437) : const Color(0xFFE0E1E4);
   
   // Outline & States
-  static const outline = Color(0xFF968DA0);
-  static const outlineVariant = Color(0xFF4B4454);
-  static const error = Color(0xFFFFB4AB);
+  static Color get outline => isDarkMode ? const Color(0xFF968DA0) : const Color(0xFF79747E);
+  static Color get outlineVariant => isDarkMode ? const Color(0xFF4B4454) : const Color(0xFFCAC4D0);
+  static Color get error => isDarkMode ? const Color(0xFFFFB4AB) : const Color(0xFFB3261E);
 }
 
 class AppTheme {
-  static ThemeData get darkTheme {
-    final base = ThemeData.dark();
+  static ThemeData get currentTheme {
+    final base = AppColors.isDarkMode ? ThemeData.dark() : ThemeData.light();
     
     return base.copyWith(
       scaffoldBackgroundColor: AppColors.background,
-      colorScheme: ColorScheme.dark(
+      colorScheme: (AppColors.isDarkMode ? ColorScheme.dark() : ColorScheme.light()).copyWith(
         primary: AppColors.primary,
         primaryContainer: AppColors.primaryContainer,
         secondary: AppColors.secondary,
         tertiary: AppColors.tertiary,
-        // background is deprecated, using surface instead
         surface: AppColors.surface,
-        onPrimary: const Color(0xFF430089),
-        onSecondary: const Color(0xFF003545),
-        // onBackground is deprecated, using onSurface instead
+        onPrimary: AppColors.isDarkMode ? const Color(0xFF430089) : const Color(0xFFFFFFFF),
+        onSecondary: AppColors.isDarkMode ? const Color(0xFF003545) : const Color(0xFFFFFFFF),
         onSurface: AppColors.onSurface,
         onSurfaceVariant: AppColors.onSurfaceVariant,
         surfaceContainerHighest: AppColors.surfaceVariant,
@@ -93,7 +93,7 @@ class AppTheme {
           letterSpacing: 2.0,
         ),
       ),
-      iconTheme: const IconThemeData(
+      iconTheme: IconThemeData(
         color: AppColors.onSurface,
       ),
     );

@@ -42,7 +42,7 @@ class _SignupScreenState extends State<SignupScreen> {
       lastDate: now,
       builder: (context, child) => Theme(
         data: ThemeData.dark().copyWith(
-          colorScheme: const ColorScheme.dark(
+          colorScheme: ColorScheme.dark(
             primary: AppColors.primary,
             onPrimary: AppColors.onPrimaryFixed,
             surface: AppColors.surfaceContainer,
@@ -127,7 +127,7 @@ class _SignupScreenState extends State<SignupScreen> {
               backgroundColor: Colors.transparent,
               elevation: 0,
               pinned: true,
-              title: const Text('MELODY',
+              title: Text('MELODY',
                   style: TextStyle(
                       color: AppColors.primary,
                       fontWeight: FontWeight.w900,
@@ -136,27 +136,27 @@ class _SignupScreenState extends State<SignupScreen> {
                 if (isWide) ...[
                   TextButton(
                       onPressed: () {},
-                      child: const Text('EXPLORE',
+                      child: Text('EXPLORE',
                           style: TextStyle(color: AppColors.outline))),
                   TextButton(
                       onPressed: () {},
-                      child: const Text('PREMIUM',
+                      child: Text('PREMIUM',
                           style: TextStyle(color: AppColors.outline))),
                   TextButton(
                       onPressed: () {},
-                      child: const Text('SUPPORT',
+                      child: Text('SUPPORT',
                           style: TextStyle(color: AppColors.outline))),
                 ],
-                const SizedBox(width: 16),
-                const CircleAvatar(
+                SizedBox(width: 16),
+                CircleAvatar(
                   backgroundColor: AppColors.surfaceContainerHighest,
                   child: Icon(Icons.person, color: AppColors.primary),
                 ),
-                const SizedBox(width: 24),
+                SizedBox(width: 24),
               ],
             ),
             SliverPadding(
-              padding: const EdgeInsets.symmetric(
+              padding: EdgeInsets.symmetric(
                   horizontal: 24.0, vertical: 24.0),
               sliver: SliverList(
                 delegate: SliverChildListDelegate([
@@ -165,7 +165,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(child: _buildHero(context)),
-                        const SizedBox(width: 48),
+                        SizedBox(width: 48),
                         Expanded(child: _buildForm(context)),
                       ],
                     )
@@ -173,9 +173,9 @@ class _SignupScreenState extends State<SignupScreen> {
                     Column(
                       children: [
                         _buildHero(context),
-                        const SizedBox(height: 48),
+                        SizedBox(height: 48),
                         _buildForm(context),
-                        const SizedBox(height: 48),
+                        SizedBox(height: 48),
                       ],
                     )
                 ]),
@@ -192,7 +192,7 @@ class _SignupScreenState extends State<SignupScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
             color: AppColors.surfaceVariant.withValues(alpha: 0.4),
             borderRadius: BorderRadius.circular(20),
@@ -202,25 +202,25 @@ class _SignupScreenState extends State<SignupScreen> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text('EXCLUSIVE ACCESS',
+              Text('EXCLUSIVE ACCESS',
                   style: TextStyle(
                       color: AppColors.tertiary,
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 2)),
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
               Container(
                   width: 4,
                   height: 4,
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                       shape: BoxShape.circle, color: AppColors.tertiary)),
             ],
           ),
         ),
-        const SizedBox(height: 24),
+        SizedBox(height: 24),
         Text('Your Sound,\nReimagined.',
             style: Theme.of(context).textTheme.displayMedium),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
         Text(
           'Join the sanctuary of high-fidelity audio. Experience music with the editorial depth it deserves.',
           style: Theme.of(context)
@@ -228,12 +228,12 @@ class _SignupScreenState extends State<SignupScreen> {
               .bodyLarge
               ?.copyWith(color: AppColors.onSurfaceVariant),
         ),
-        const SizedBox(height: 32),
+        SizedBox(height: 32),
         Container(
           height: 200,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
-            image: const DecorationImage(
+            image: DecorationImage(
               image: NetworkImage(
                   'https://lh3.googleusercontent.com/aida-public/AB6AXuBBgRo9Pk14lvTUFoMNHrwEDIXqGThFgIujmuMq8fPn4SdmHKYItO15gDofeCzaKHVc1xW2yXQQgHoXZk14-ag2Ops8NLHfVvtmeg1M0qNskKBi--nmLKYwDWdaRAekSDzw04gF3yatvzadACPw6ijp4C_62E5FwOyH4qF6JktpNzOfAHdWIMlGpnEULkFvHhEBXXLOaRLFDD4Zl14s1XDwWSoGuTp732ahpMf3i7bHVDoPzBDVaeFG6fb-8l9hNmjcjwcL5tjlT_c'),
               fit: BoxFit.cover,
@@ -246,7 +246,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
   Widget _buildForm(BuildContext context) {
     return GlassCard(
-      padding: const EdgeInsets.all(32),
+      padding: EdgeInsets.all(32),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -259,7 +259,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   children: [
                     Text('Create Account',
                         style: Theme.of(context).textTheme.headlineMedium),
-                    const SizedBox(height: 8),
+                    SizedBox(height: 8),
                     Text('Step 1 of 1: Personal Profile',
                         style: Theme.of(context)
                             .textTheme
@@ -268,30 +268,30 @@ class _SignupScreenState extends State<SignupScreen> {
                   ],
                 ),
               ),
-              const CircleAvatar(
+              CircleAvatar(
                 backgroundColor: AppColors.surfaceContainerHigh,
                 child:
                     Icon(Icons.music_note, color: AppColors.secondary),
               ),
             ],
           ),
-          const SizedBox(height: 32),
+          SizedBox(height: 32),
           Row(
             children: [
               Expanded(
                   child: _buildInput('NAME', 'John',
                       controller: _firstNameCtrl)),
-              const SizedBox(width: 16),
+              SizedBox(width: 16),
               Expanded(
                   child: _buildInput('SURNAME', 'Doe',
                       controller: _lastNameCtrl)),
             ],
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           _buildInput('EMAIL ADDRESS', 'john.doe@example.com',
               controller: _emailCtrl,
               keyboardType: TextInputType.emailAddress),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           // Birthdate (tap to open picker)
           GestureDetector(
             onTap: _pickDate,
@@ -300,23 +300,23 @@ class _SignupScreenState extends State<SignupScreen> {
                   controller: _birthdateCtrl, suffix: Icons.calendar_month),
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           _buildInput('PASSWORD', '••••••••',
               controller: _passwordCtrl,
               suffix: _obscurePassword
                   ? Icons.visibility
                   : Icons.visibility_off,
-              obscure: true,
+              obscure: _obscurePassword,
               onSuffixTap: () =>
                   setState(() => _obscurePassword = !_obscurePassword)),
-          const SizedBox(height: 32),
+          SizedBox(height: 32),
 
           // Join Button
           Container(
             width: double.infinity,
             height: 56,
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
+              gradient: LinearGradient(
                   colors: [AppColors.primary, AppColors.primaryContainer]),
               borderRadius: BorderRadius.circular(16),
             ),
@@ -329,17 +329,17 @@ class _SignupScreenState extends State<SignupScreen> {
                     borderRadius: BorderRadius.circular(16)),
               ),
               child: _isLoading
-                  ? const CircularProgressIndicator(
+                  ? CircularProgressIndicator(
                       color: AppColors.onPrimaryFixed, strokeWidth: 2)
-                  : const Text('JOIN MELODY',
+                  : Text('JOIN MELODY',
                       style: TextStyle(
                           color: AppColors.onPrimaryFixed,
                           fontWeight: FontWeight.bold,
                           letterSpacing: 1.5)),
             ),
           ),
-          const SizedBox(height: 32),
-          const Center(
+          SizedBox(height: 32),
+          Center(
             child: Text(
               'By joining Melody, you confirm you are 13+ years of age and agree to our Terms of Sound and Privacy Policy.',
               textAlign: TextAlign.center,
@@ -364,34 +364,34 @@ class _SignupScreenState extends State<SignupScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          padding: EdgeInsets.symmetric(horizontal: 16.0),
           child: Text(label,
-              style: const TextStyle(
+              style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 2,
                   color: AppColors.outline)),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         TextField(
           controller: controller,
           obscureText: obscure,
           keyboardType: keyboardType,
-          style: const TextStyle(color: AppColors.onSurface),
+          style: TextStyle(color: AppColors.onSurface),
           decoration: InputDecoration(
             hintText: hint,
             hintStyle:
                 TextStyle(color: AppColors.outline.withValues(alpha: 0.5)),
             suffixIcon: suffix != null
-                ? GestureDetector(
-                    onTap: onSuffixTap,
-                    child: Icon(suffix, color: AppColors.outline),
+                ? IconButton(
+                    icon: Icon(suffix, color: AppColors.outline),
+                    onPressed: onSuffixTap,
                   )
                 : null,
             filled: true,
             fillColor: AppColors.surfaceContainerHigh.withValues(alpha: 0.5),
             contentPadding:
-                const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                EdgeInsets.symmetric(vertical: 16, horizontal: 24),
             border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(30),
                 borderSide: BorderSide.none),

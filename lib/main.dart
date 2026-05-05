@@ -11,6 +11,7 @@ import 'screens/auth/forgot_password_screen.dart';
 import 'navigation/main_scaffold.dart';
 import 'core/services/audio_player_service.dart';
 import 'core/providers/music_provider.dart';
+import 'core/providers/theme_provider.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // NOTE: After running `flutterfire configure`, uncomment the import below
@@ -45,10 +46,10 @@ Future<void> main() async {
   } catch (e) {
     debugPrint('⚠️ AudioPlayerService init failed: $e');
   }
-
   runApp(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => MusicProvider()),
       ],
       child: const MelodyApp(),
@@ -61,17 +62,21 @@ class MelodyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Melody - Secure Gateway',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.darkTheme,
-      initialRoute: '/gateway',
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, child) {
+        return MaterialApp(
+          title: 'Melody - Secure Gateway',
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.currentTheme,
+          initialRoute: '/gateway',
       routes: {
         '/gateway': (context) => const GatewayScreen(),
         '/login': (context) => const LoginScreen(),
         '/signup': (context) => const SignupScreen(),
         '/forgot_password': (context) => const ForgotPasswordScreen(),
         '/main': (context) => const MainScaffold(),
+      },
+        );
       },
     );
   }

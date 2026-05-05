@@ -28,7 +28,7 @@ class _GatewayScreenState extends State<GatewayScreen>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 8),
+      duration: Duration(seconds: 8),
     )..repeat();
 
     // Auto-trigger biometric on screen open
@@ -70,7 +70,7 @@ class _GatewayScreenState extends State<GatewayScreen>
           _isAuthenticating = false;
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text(
                 'No biometrics enrolled. Redirecting to device settings...'),
           ),
@@ -94,7 +94,7 @@ class _GatewayScreenState extends State<GatewayScreen>
         _statusSub = 'WELCOME BACK';
         _ringColor = AppColors.secondary;
       });
-      await Future.delayed(const Duration(milliseconds: 600));
+      await Future.delayed(Duration(milliseconds: 600));
       _navigateAfterAuth();
     } else {
       setState(() {
@@ -127,7 +127,7 @@ class _GatewayScreenState extends State<GatewayScreen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const SizedBox(height: 80),
+            SizedBox(height: 80),
             // Header
             Container(
               width: 80,
@@ -139,7 +139,7 @@ class _GatewayScreenState extends State<GatewayScreen>
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.5),
                     blurRadius: 20,
-                    offset: const Offset(0, 10),
+                    offset: Offset(0, 10),
                   ),
                 ],
               ),
@@ -147,12 +147,12 @@ class _GatewayScreenState extends State<GatewayScreen>
               child: Image.network(
                 'https://lh3.googleusercontent.com/aida-public/AB6AXuARS3P3V3RnTR4MDqDZg89Zk0BMamfjP_fmRTLE0pGF3oAJ5gHge6MtOoWNVuEEcPlRUB-fNXepgsRc429Hl_ULTdLMvJUxt9GFB8JCW0NEJbCsKJXVL6Zgb_8DxIBpLtS_whpGjDE0eLey5Gxna8_FZjwRi2uj7cqlgt3Mtfsr8p1_rPTK_yvH9kle_8JD6mMMg2mDIy5L46Ad-UVwlx9JaOFUA_KAk_d8RRR9X6tVXtrOIGIYWh58nURuB00d302VojEmwROf0Do',
                 fit: BoxFit.cover,
-                opacity: const AlwaysStoppedAnimation(0.8),
+                opacity: AlwaysStoppedAnimation(0.8),
                 errorBuilder: (context, error, stackTrace) =>
                     Container(color: AppColors.surfaceContainerHighest),
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
             Text(
               'MELODY',
               style: Theme.of(context).textTheme.displaySmall?.copyWith(
@@ -160,7 +160,7 @@ class _GatewayScreenState extends State<GatewayScreen>
                     letterSpacing: 4.0,
                   ),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             Text(
               'SECURE GATEWAY',
               style: Theme.of(context).textTheme.labelSmall?.copyWith(
@@ -168,7 +168,7 @@ class _GatewayScreenState extends State<GatewayScreen>
                   ),
             ),
 
-            const Spacer(),
+            Spacer(),
 
             // Biometric Fingerprint Section
             GestureDetector(
@@ -266,7 +266,7 @@ class _GatewayScreenState extends State<GatewayScreen>
                           _statusMessage,
                           style: Theme.of(context).textTheme.titleLarge,
                         ),
-                        const SizedBox(height: 4),
+                        SizedBox(height: 4),
                         Text(
                           _statusSub,
                           style: Theme.of(context)
@@ -281,11 +281,11 @@ class _GatewayScreenState extends State<GatewayScreen>
               ),
             ),
 
-            const Spacer(),
+            Spacer(),
 
             // Footer
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32.0),
+              padding: EdgeInsets.symmetric(horizontal: 32.0),
               child: Column(
                 children: [
                   Container(
@@ -301,13 +301,13 @@ class _GatewayScreenState extends State<GatewayScreen>
                       width: 64,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(2),
-                        gradient: const LinearGradient(
+                        gradient: LinearGradient(
                           colors: [AppColors.primary, AppColors.secondary],
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 32),
+                  SizedBox(height: 32),
                   SizedBox(
                     width: double.infinity,
                     height: 60,
@@ -325,7 +325,7 @@ class _GatewayScreenState extends State<GatewayScreen>
                       child: Container(
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
-                          gradient: const LinearGradient(
+                          gradient: LinearGradient(
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                             colors: [
@@ -338,11 +338,11 @@ class _GatewayScreenState extends State<GatewayScreen>
                             BoxShadow(
                               color: AppColors.primary.withValues(alpha: 0.1),
                               blurRadius: 20,
-                              offset: const Offset(0, 10),
+                              offset: Offset(0, 10),
                             ),
                           ],
                         ),
-                        child: const Text('Enter with Pin',
+                        child: Text('Enter with Pin',
                             style: TextStyle(
                                 color: AppColors.onPrimaryFixed,
                                 fontSize: 18,
@@ -350,14 +350,14 @@ class _GatewayScreenState extends State<GatewayScreen>
                       ),
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24),
                   Row(
                     children: [
-                      const Expanded(
+                      Expanded(
                           child: Divider(color: AppColors.outlineVariant)),
                       Padding(
                         padding:
-                            const EdgeInsets.symmetric(horizontal: 16.0),
+                            EdgeInsets.symmetric(horizontal: 16.0),
                         child: Text(
                           'OR CONNECT WITH',
                           style: Theme.of(context)
@@ -366,17 +366,17 @@ class _GatewayScreenState extends State<GatewayScreen>
                               ?.copyWith(fontSize: 10),
                         ),
                       ),
-                      const Expanded(
+                      Expanded(
                           child: Divider(color: AppColors.outlineVariant)),
                     ],
                   ),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24),
                   Row(
                     children: [
                       Expanded(
                         child: GlassCard(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          child: const Row(
+                          padding: EdgeInsets.symmetric(vertical: 16),
+                          child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Icon(Icons.g_mobiledata,
@@ -391,11 +391,11 @@ class _GatewayScreenState extends State<GatewayScreen>
                           ),
                         ),
                       ),
-                      const SizedBox(width: 16),
+                      SizedBox(width: 16),
                       Expanded(
                         child: GlassCard(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          child: const Row(
+                          padding: EdgeInsets.symmetric(vertical: 16),
+                          child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Icon(Icons.apple,
@@ -412,7 +412,7 @@ class _GatewayScreenState extends State<GatewayScreen>
                       ),
                     ],
                   ),
-                  const SizedBox(height: 32),
+                  SizedBox(height: 32),
                 ],
               ),
             ),

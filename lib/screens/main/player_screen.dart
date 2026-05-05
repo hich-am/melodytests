@@ -31,6 +31,8 @@ class _PlayerScreenState extends State<PlayerScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Theme.of(context); // Force complete rebuild on theme change
+    
     return Scaffold(
       body: AmbientBackground(
         child: StreamBuilder<Duration>(
@@ -39,7 +41,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
             final track = AudioPlayerService.instance.currentTrack;
             
             if (track == null) {
-              return const Center(
+              return Center(
                 child: Text(
                   'No track is currently playing.',
                   style: TextStyle(color: AppColors.outlineVariant),
@@ -53,13 +55,13 @@ class _PlayerScreenState extends State<PlayerScreen> {
                   backgroundColor: Colors.transparent,
                   elevation: 0,
                   pinned: true,
-                  title: const Text('NOW PLAYING', style: TextStyle(color: AppColors.primary, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 2)),
+                  title: Text('NOW PLAYING', style: TextStyle(color: AppColors.primary, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 2)),
                   centerTitle: true,
                 ),
                 SliverFillRemaining(
                   hasScrollBody: false,
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                    padding: EdgeInsets.symmetric(horizontal: 24.0),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -69,14 +71,14 @@ class _PlayerScreenState extends State<PlayerScreen> {
                           child: Container(
                             width: MediaQuery.of(context).size.width * 0.8,
                             height: MediaQuery.of(context).size.width * 0.8,
-                            constraints: const BoxConstraints(maxHeight: 400, maxWidth: 400),
+                            constraints: BoxConstraints(maxHeight: 400, maxWidth: 400),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(24),
                               boxShadow: [
                                 BoxShadow(
                                   color: AppColors.primaryContainer.withValues(alpha: 0.3),
                                   blurRadius: 40,
-                                  offset: const Offset(0, 20),
+                                  offset: Offset(0, 20),
                                 ),
                               ],
                               image: DecorationImage(
@@ -86,7 +88,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 48),
+                        SizedBox(height: 48),
 
                         // Track Info & Favorite Button
                         Row(
@@ -103,7 +105,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),
-                                  const SizedBox(height: 8),
+                                  SizedBox(height: 8),
                                   Text(
                                     track.artistName,
                                     style: Theme.of(context).textTheme.titleMedium?.copyWith(color: AppColors.onSurfaceVariant),
@@ -113,10 +115,10 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                 ],
                               ),
                             ),
-                            const SizedBox(width: 16),
+                            SizedBox(width: 16),
                             if (_uid != null)
                               StreamBuilder<List<Track>>(
-                                initialData: const <Track>[],
+                                initialData: <Track>[],
                                 stream: FirestoreService.instance.favoritesStream(_uid),
                                 builder: (context, favSnapshot) {
                                   final isFavorite = favSnapshot.data?.any((t) => t.id == track.id) ?? false;
@@ -139,7 +141,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                           ],
                         ),
 
-                        const SizedBox(height: 32),
+                        SizedBox(height: 32),
 
                         // Progress Bar
                         StreamBuilder<Duration?>(
@@ -161,8 +163,8 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                     inactiveTrackColor: AppColors.surfaceContainerHighest,
                                     thumbColor: AppColors.onPrimaryFixed,
                                     trackHeight: 4.0,
-                                    thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6.0),
-                                    overlayShape: const RoundSliderOverlayShape(overlayRadius: 14.0),
+                                    thumbShape: RoundSliderThumbShape(enabledThumbRadius: 6.0),
+                                    overlayShape: RoundSliderOverlayShape(overlayRadius: 14.0),
                                   ),
                                   child: Slider(
                                     value: progress.clamp(0.0, 1.0),
@@ -173,7 +175,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                   ),
                                 ),
                                 Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                                  padding: EdgeInsets.symmetric(horizontal: 16.0),
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
@@ -187,7 +189,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                           }
                         ),
 
-                        const SizedBox(height: 32),
+                        SizedBox(height: 32),
 
                         // Playback Controls
                         StreamBuilder<PlayerState>(
@@ -208,7 +210,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                   },
                                 ),
                                 IconButton(
-                                  icon: const Icon(Icons.skip_previous, color: AppColors.onSurface, size: 40),
+                                  icon: Icon(Icons.skip_previous, color: AppColors.onSurface, size: 40),
                                   onPressed: () {
                                     AudioPlayerService.instance.playPrevious();
                                   },
@@ -220,7 +222,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                     height: 80,
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
-                                      gradient: const LinearGradient(
+                                      gradient: LinearGradient(
                                         colors: [AppColors.primary, AppColors.primaryContainer],
                                       ),
                                       boxShadow: [
@@ -238,7 +240,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                   ),
                                 ),
                                 IconButton(
-                                  icon: const Icon(Icons.skip_next, color: AppColors.onSurface, size: 40),
+                                  icon: Icon(Icons.skip_next, color: AppColors.onSurface, size: 40),
                                   onPressed: () {
                                     AudioPlayerService.instance.playNext();
                                   },
@@ -255,34 +257,34 @@ class _PlayerScreenState extends State<PlayerScreen> {
                           }
                         ),
 
-                        const SizedBox(height: 32),
+                        SizedBox(height: 32),
                         
                         // Playlist / Queue Button
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text('UP NEXT', style: TextStyle(color: AppColors.outline, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+                            Text('UP NEXT', style: TextStyle(color: AppColors.outline, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
                             IconButton(
-                              icon: const Icon(Icons.queue_music, color: AppColors.primary),
+                              icon: Icon(Icons.queue_music, color: AppColors.primary),
                               onPressed: () {
                                 showModalBottomSheet(
                                   context: context,
                                   backgroundColor: AppColors.surface,
-                                  shape: const RoundedRectangleBorder(
+                                  shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
                                   ),
                                   builder: (context) {
                                     final playlist = AudioPlayerService.instance.currentPlaylist;
                                     return Container(
-                                      padding: const EdgeInsets.symmetric(vertical: 24),
+                                      padding: EdgeInsets.symmetric(vertical: 24),
                                       child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          const Padding(
+                                          Padding(
                                             padding: EdgeInsets.symmetric(horizontal: 24),
                                             child: Text('Playing List', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                                           ),
-                                          const SizedBox(height: 16),
+                                          SizedBox(height: 16),
                                           Expanded(
                                             child: ListView.builder(
                                               itemCount: playlist.length,
@@ -290,7 +292,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                                 final t = playlist[index];
                                                 final isCurrent = t.id == track.id;
                                                 return ListTile(
-                                                  contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
+                                                  contentPadding: EdgeInsets.symmetric(horizontal: 24, vertical: 4),
                                                   leading: Container(
                                                     width: 48,
                                                     height: 48,
@@ -303,8 +305,8 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                                     ),
                                                   ),
                                                   title: Text(t.name, style: TextStyle(fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal, color: isCurrent ? AppColors.primary : AppColors.onSurface)),
-                                                  subtitle: Text(t.artistName, style: const TextStyle(color: AppColors.outline, fontSize: 12)),
-                                                  trailing: isCurrent ? const Icon(Icons.volume_up, color: AppColors.primary) : null,
+                                                  subtitle: Text(t.artistName, style: TextStyle(color: AppColors.outline, fontSize: 12)),
+                                                  trailing: isCurrent ? Icon(Icons.volume_up, color: AppColors.primary) : null,
                                                   onTap: () {
                                                     Navigator.pop(context);
                                                     AudioPlayerService.instance.playTrack(t, playlist: playlist);
@@ -323,7 +325,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                           ],
                         ),
 
-                        const SizedBox(height: 100), // Spacer for nav bar
+                        SizedBox(height: 100), // Spacer for nav bar
                       ],
                     ),
                   ),
